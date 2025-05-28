@@ -26,7 +26,7 @@ const MapView = ({
       latitude: center[1],
       zoom: zoom
     });
-  }, [center, zoom]);
+  }, []);
 
   return (
     <Map
@@ -36,65 +36,70 @@ const MapView = ({
       mapboxAccessToken={MAPBOX_TOKEN}
       style={style}
     >
-     {markers.map(marker => {
-  // Determina il colore del marker in base al tipo e alla fonte
-  let backgroundColor;
-  let borderColor = 'transparent';
-  let borderWidth = '0';
-  
-  // Colore base per il tipo di spot
-  if (marker.type === 'artwork') {
-    backgroundColor = '#3B82F6'; // Blu per opere d'arte
-  } else if (marker.type === 'venue') {
-    backgroundColor = '#8B5CF6'; // Viola per luoghi
-  } else if (marker.type === 'event') {
-    backgroundColor = '#EC4899'; // Rosa per eventi
-  } else {
-    backgroundColor = '#10B981'; // Verde per collezioni o altro
-  }
-  
-  // Aggiungi bordo distintivo in base alla fonte
-  if (marker.source === 'openai') {
-    borderColor = '#F59E0B'; // Bordo arancione per risultati OpenAI
-    borderWidth = '3px';
-  } else if (marker.source === 'database') {
-    borderColor = '#06B6D4'; // Bordo azzurro per contenuti UGC
-    borderWidth = '3px';
-  }
-  
-  return (
-    <div
-      key={marker.id}
-      className="marker"
-      style={{
-        position: 'absolute',
-        left: '0',
-        top: '0',
-        transform: `translate(
+      {markers.map(marker => {
+        // Determina il colore del marker in base al tipo e alla fonte
+        let backgroundColor;
+        let borderColor = 'transparent';
+        let borderWidth = '0';
+
+        // Colore base per il tipo di spot
+        if (marker.type === 'artwork') {
+          backgroundColor = '#3B82F6'; // Blu per opere d'arte
+        } else if (marker.type === 'venue') {
+          backgroundColor = '#8B5CF6'; // Viola per luoghi
+        } else if (marker.type === 'event') {
+          backgroundColor = '#EC4899'; // Rosa per eventi
+        } else {
+          backgroundColor = '#10B981'; // Verde per collezioni o altro
+        }
+
+        // Aggiungi bordo distintivo in base alla fonte
+        if (marker.source === 'openai') {
+          borderColor = '#F59E0B'; // Bordo arancione per risultati OpenAI
+          borderWidth = '3px';
+        } else if (marker.source === 'database') {
+          borderColor = '#06B6D4'; // Bordo azzurro per contenuti UGC
+          borderWidth = '3px';
+        }
+
+
+
+        console.log(marker.coordinates[0], marker.coordinates[1])
+
+
+        return (
+          <div
+            key={marker.name}
+            className="marker"
+            style={{
+              position: 'absolute',
+              left: '0',
+              top: '0',
+              transform: `translate(
           ${viewState.longitude === marker.coordinates[0] && viewState.latitude === marker.coordinates[1] ? '-50%, -50%' : '0, 0'}
         )`,
-        width: '24px',
-        height: '24px',
-        backgroundColor,
-        borderRadius: '50%',
-        borderColor,
-        borderStyle: 'solid',
-        borderWidth,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: 'white',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-      }}
-      onClick={() => onMarkerClick && onMarkerClick(marker)}
-      title={`${marker.title || marker.name} (${marker.source === 'openai' ? 'AI' : 'UGC'})`}
-    >
-      {marker.type === 'artwork' ? 'A' : marker.type === 'venue' ? 'V' : marker.type === 'event' ? 'E' : 'C'}
-    </div>
-  );
-})}
+              width: '24px',
+              height: '24px',
+              backgroundColor,
+              borderRadius: '50%',
+              borderColor,
+              borderStyle: 'solid',
+              borderWidth,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+            }}
+            onClick={() => onMarkerClick && onMarkerClick(marker)}
+            title={`${marker.title || marker.name} (${marker.source === 'openai' ? 'AI' : 'UGC'})`}
+          >
+            {marker.type === 'artwork' ? 'A' : marker.type === 'venue' ? 'V' : marker.type === 'event' ? 'E' : 'C'}
+          </div>
+        );
+      })}
 
     </Map>
   );
@@ -105,7 +110,7 @@ MapView.propTypes = {
   zoom: PropTypes.number,
   markers: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      // id: PropTypes.string.isRequired,
       coordinates: PropTypes.array.isRequired,
       title: PropTypes.string,
       type: PropTypes.string

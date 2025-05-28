@@ -5,6 +5,7 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Alert from '../ui/Alert';
+import MapView from './MapView'; // Assicurati di avere un componente MapView per la mappa
 
 const SearchInterface = () => {
   const [searchParams, setSearchParams] = useState({
@@ -14,8 +15,8 @@ const SearchInterface = () => {
     mood: '',
     musicGenre: '',
     distance: 10,
-    lat: null,
-    lng: null
+    lat: 41.87893221758316, 
+    lng: 12.479620747531385
   });
 
   const [results, setResults] = useState([]);
@@ -276,84 +277,94 @@ const SearchInterface = () => {
         </form>
       </Card>
 
-      {/* Risultati */}
-      {results.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Risultati ({results.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {results.map(spot => (
-              <Card
-                key={spot._id}
-                className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                onClick={() => handleSpotClick(spot._id)}
-              >
-                <div className="h-48 bg-gray-200 relative">
-                  {spot.images && spot.images.length > 0 ? (
-                    <img
-                      src={spot.images[0]}
-                      alt={spot.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-gray-500">Nessuna immagine</span>
+      <div className="flex">
+        <div className="w-1/2">
+          {/* Risultati */}
+          {results.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Risultati ({results.length})</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {results.map((spot, index) => (
+                  <Card
+                    key={index}
+                    className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                    onClick={() => handleSpotClick(spot._id)}
+                  >
+                    <div className="h-48 bg-gray-200 relative">
+                      {spot.images && spot.images.length > 0 ? (
+                        <img
+                          src={spot.images[0]}
+                          alt={spot.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-gray-500">Nessuna immagine</span>
+                        </div>
+                      )}
+                      {/* Esempio semplificato */}
+                      <div className="absolute top-2 left-2 flex space-x-2">
+                        <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+                          {spot.type === 'artwork' ? 'Opera' : spot.type === 'venue' ? 'Luogo' : 'Collezione'}
+                        </span>
+                        {spot.category && (
+                          <span className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
+                            {spot.category}
+                          </span>
+                        )}
+                        {/* Badge per la fonte del risultato */}
+                        <span className={`px-2 py-1 text-white text-xs font-medium rounded-full ${spot.source === 'openai' ? 'bg-amber-500' : 'bg-cyan-500'
+                          }`}>
+                          {spot.source === 'openai' ? 'AI' : 'UGC'}
+                        </span>
+                      </div>
+
                     </div>
-                  )}
-                  {/* Esempio semplificato */}
-                  <div className="absolute top-2 left-2 flex space-x-2">
-                    <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-                      {spot.type === 'artwork' ? 'Opera' : spot.type === 'venue' ? 'Luogo' : 'Collezione'}
-                    </span>
-                    {spot.category && (
-                      <span className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
-                        {spot.category}
-                      </span>
-                    )}
-                    {/* Badge per la fonte del risultato */}
-                    <span className={`px-2 py-1 text-white text-xs font-medium rounded-full ${spot.source === 'openai' ? 'bg-amber-500' : 'bg-cyan-500'
-                      }`}>
-                      {spot.source === 'openai' ? 'AI' : 'UGC'}
-                    </span>
-                  </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-1">{spot.name}</h3>
+                      {spot.location && (
+                        <p className="text-gray-500 text-sm mb-2">
+                          {spot.location.city}, {spot.location.country}
+                        </p>
+                      )}
+                      <p className="text-gray-700 text-sm line-clamp-2 mb-3">
+                        {spot.description}
+                      </p>
 
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-1">{spot.name}</h3>
-                  {spot.location && (
-                    <p className="text-gray-500 text-sm mb-2">
-                      {spot.location.city}, {spot.location.country}
-                    </p>
-                  )}
-                  <p className="text-gray-700 text-sm line-clamp-2 mb-3">
-                    {spot.description}
-                  </p>
+                      {/* Tags, mood, generi musicali */}
+                      <div className="flex flex-wrap gap-1">
+                        {spot.mood && spot.mood.slice(0, 2).map((m, i) => (
+                          <span key={`mood-${i}`} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
+                            {m}
+                          </span>
+                        ))}
+                        {spot.musicGenres && spot.musicGenres.slice(0, 2).map((genre, i) => (
+                          <span key={`genre-${i}`} className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                            {genre}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
 
-                  {/* Tags, mood, generi musicali */}
-                  <div className="flex flex-wrap gap-1">
-                    {spot.mood && spot.mood.slice(0, 2).map((m, i) => (
-                      <span key={`mood-${i}`} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
-                        {m}
-                      </span>
-                    ))}
-                    {spot.musicGenres && spot.musicGenres.slice(0, 2).map((genre, i) => (
-                      <span key={`genre-${i}`} className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+          {results.length === 0 && !loading && searchParams.query && (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Nessun risultato trovato</p>
+              <p className="mt-2">Prova a modificare i parametri di ricerca</p>
+            </div>
+          )}
         </div>
-      )}
 
-      {results.length === 0 && !loading && searchParams.query && (
-        <div className="text-center py-8">
-          <p className="text-gray-500">Nessun risultato trovato</p>
-          <p className="mt-2">Prova a modificare i parametri di ricerca</p>
+        <div className="w-1/2">
+          <MapView markers={results} center={[searchParams.lng, searchParams.lat]} />
         </div>
-      )}
+      </div>
+
+
     </div>
   );
 };
