@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Map from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Marker } from 'react-map-gl';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iNmE1eG5zMDc2NDJtc2Eyd3ZwZWE1NCJ9.VGF2pus_hDZCwcXXg6xlsg';
 
@@ -64,9 +65,50 @@ const MapView = ({
 
 
 
-        console.log(marker.coordinates[0], marker.coordinates[1])
+        // console.log(marker.coordinates[0], marker.coordinates[1])
 
 
+
+        return (
+          <Marker
+            key={marker.name}
+            longitude={marker.coordinates[0]}
+            latitude={marker.coordinates[1]}
+            anchor="center"
+            onClick={() => {
+              console.log('Marker clicked:', marker);
+              return onMarkerClick && onMarkerClick(marker)
+            }}
+            
+          >
+            <div
+              style={{
+                width: '24px',
+                height: '24px',
+                backgroundColor,
+                borderRadius: '50%',
+                borderColor,
+                borderStyle: 'solid',
+                borderWidth,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+              title={`${marker.title || marker.name} (${marker.source === 'openai' ? 'AI' : 'UGC'})`}
+            >
+              {marker.type === 'artwork' ? 'A' : marker.type === 'venue' ? 'V' : marker.type === 'event' ? 'E' : 'C'}
+            </div>
+          </Marker>
+        );
+
+
+
+
+        /*
         return (
           <div
             key={marker.name}
@@ -99,6 +141,12 @@ const MapView = ({
             {marker.type === 'artwork' ? 'A' : marker.type === 'venue' ? 'V' : marker.type === 'event' ? 'E' : 'C'}
           </div>
         );
+        */
+
+
+
+
+
       })}
 
     </Map>

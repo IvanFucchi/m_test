@@ -20,7 +20,7 @@ export const aiGeneratedSpots = async (query, options = {}) => {
   let prompt = `Genera 3-5 spot artistici a Roma basati sulla query: "${query}".`;
 
 
-  /*
+  
   if (lat && lng && distance) {
     prompt += ` Gli spot devono essere entro ${distance}km dalle coordinate [${lng}, ${lat}].`;
   }
@@ -32,7 +32,7 @@ export const aiGeneratedSpots = async (query, options = {}) => {
   if (musicGenre) {
     prompt += ` Gli spot dovrebbero essere associati al genere musicale: ${musicGenre}.`;
   }
-  */
+  
 
   prompt += ` Formatta i risultati come un array JSON con i seguenti campi per ogni spot: 
       name (nome dello spot), 
@@ -51,25 +51,6 @@ export const aiGeneratedSpots = async (query, options = {}) => {
 
 
   // Chiamata reale all'API OpenAI
-  /*
-  const response = await axios.post(
-    'https://api.openai.com/v1/chat/completions',
-    {
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'Sei un esperto d\'arte e cultura che conosce Roma in dettaglio.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7
-    },
-    {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    }
-   );
-  */
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -112,36 +93,6 @@ export const aiGeneratedSpots = async (query, options = {}) => {
   } catch (errore) {
     console.error('Errore nel parsing del JSON:', errore);
   }
-
-
-  // Estrai e analizza i risultati
-  // const content = response.data;
-  // let spots = [];
-  //  console.log('Risposta da OpenAI:', response.data);
-
-  /* 
-  try {
-    // Estrai l'array JSON dalla risposta
-    const jsonMatch = content.match(/\[[\s\S]*\]/);
-    if (jsonMatch) {
-      spots = JSON.parse(jsonMatch[0]);
-    } else {
-      // console.error('Formato di risposta non valido da OpenAI');
-      return [];
-    }
-  } catch (error) {
-    // console.error('Errore nel parsing della risposta OpenAI:', error);
-    return [];
-  }
-  */
-
-  // return spots;
-  /*  
-  } catch (error) {
-    // console.error('Errore nella generazione di spot con OpenAI:', error);
-    return [];
-  }
-  */
 };
 
 
