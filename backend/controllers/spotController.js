@@ -6,6 +6,7 @@ import { buildSpotQuery, buildPaginationOptions } from '../utils/queryBuilder.js
 // @route   GET /api/spots
 // @access  Public
 export const getSpots = async (req, res, next) => {
+  // console.log('getSpots called with query:', req.query);
   try {
     // Estrai parametri di ricerca
     const { search, lat, lng, distance, mood, musicGenre, source } = req.query;
@@ -14,13 +15,14 @@ export const getSpots = async (req, res, next) => {
     let combinedResults = [];
     
     // Step 1: Ottieni risultati da OpenAI (fonte primaria)
-    if (!source || source === 'all' || source === 'openai') {
+    // if (!source || source === 'all' || source === 'openai') {
       const openaiResults = await aiGeneratedSpots(search, {
         lat, lng, distance, mood, musicGenre
       });
       combinedResults = [...openaiResults]; // Ogni risultato ha source: 'openai'
-    }
+    // }
     
+    /*
     // Step 2: Ottieni risultati dal database (contenuti UGC)
     if (!source || source === 'all' || source === 'database') {
       // Costruisci la query utilizzando il builder
@@ -46,7 +48,8 @@ export const getSpots = async (req, res, next) => {
       
       combinedResults = [...combinedResults, ...dbSpotsWithSource];
     }
-    
+    */
+
     // Restituisci i risultati combinati
     res.json({
       success: true,

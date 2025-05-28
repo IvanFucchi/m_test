@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import { notFound, errorHandler, validationErrorHandler, authErrorHandler } from './middleware/errorHandler.js';
 
+/*
 // Test temporaneo per OpenAI
 import { aiGeneratedSpots } from './utils/openaiService.js';
 
@@ -23,7 +24,7 @@ const testOpenAI = async () => {
 // Esegui il test
 testOpenAI();
 
-
+*/
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
