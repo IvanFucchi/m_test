@@ -4,7 +4,7 @@ import Map from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Marker } from 'react-map-gl';
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iNmE1eG5zMDc2NDJtc2Eyd3ZwZWE1NCJ9.VGF2pus_hDZCwcXXg6xlsg';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iY2tjaWt4MHJjdzJzc2F1em5scXI5aiJ9.eV_JXLtKNGzFIvsvXBV8FQ';
 
 const MapView = ({
   center = [-74.5, 40],
