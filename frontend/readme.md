@@ -26,6 +26,8 @@
 
 - distinzione eventi gratuiti e non 
 
+- autocompletamento nella barra di ricerca (suggerimento) 
+
 
 
 - aggiustare risposta openai riguardo agli eventi , solo eventi reali non suggestioni inventate 

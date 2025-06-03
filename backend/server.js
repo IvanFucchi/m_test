@@ -5,26 +5,9 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import { notFound, errorHandler, validationErrorHandler, authErrorHandler } from './middleware/errorHandler.js';
 
-/*
-// Test temporaneo per OpenAI
-import { aiGeneratedSpots } from './utils/openaiService.js';
+import eventsRouter from './routes/eventRoutes.js';
 
-const testOpenAI = async () => {
-  try {
-    console.log('Testando aiGeneratedSpots...');
-    console.log('OPENAI_API_KEY presente:', process.env.OPENAI_API_KEY ? 'Sì' : 'No');
-    
-    const spots = await aiGeneratedSpots('arte roma', {});
-    console.log('Risultati:', JSON.stringify(spots, null, 2));
-  } catch (error) {
-    console.error('Errore nel test:', error);
-  }
-};
 
-// Esegui il test
-testOpenAI();
-
-*/
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
@@ -74,6 +57,8 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
+
+app.use('/api/events', eventsRouter); // Rotta per gli eventi (Eventbrite)
 
 // Rotte API
 app.use('/api/auth', authRoutes);

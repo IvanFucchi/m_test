@@ -1,5 +1,6 @@
 import Spot from '../models/Spot.js';
 import { aiGeneratedSpots } from '../utils/openaiService.js';
+import fetchEvents from '../utils/fetchRealEvents.js';
 import { buildSpotQuery, buildPaginationOptions } from '../utils/queryBuilder.js';
 
 // @desc    Ottieni spot in base ai parametri di ricerca

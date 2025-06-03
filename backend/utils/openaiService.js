@@ -17,7 +17,7 @@ export const aiGeneratedSpots = async (query, options = {}) => {
   // Costruisci il prompt per OpenAI
   const { lat, lng, distance, mood, musicGenre } = options;
 
-  let prompt = `Genera 3-5 spot artistici a Roma basati sulla query: "${query}".`;
+  let prompt = `Genera fino a 20-25  spot artistici a Roma basati sulla query: "${query}".`;
 
 
   
@@ -37,7 +37,10 @@ export const aiGeneratedSpots = async (query, options = {}) => {
   prompt += ` Formatta i risultati come un array JSON con i seguenti campi per ogni spot: 
       name (nome dello spot), 
       description (descrizione dettagliata), 
-      type (artwork, venue, o event), 
+      type (artwork, venue, o event),
+      gratuito (booleano che indica se l'ingresso è gratuito),
+      date evento (data dell'evento, se applicabile),
+      time evento (ora dell'evento, se applicabile),   
       coordinates (array [longitudine, latitudine]), 
       address (indirizzo completo), 
       city (città), 
