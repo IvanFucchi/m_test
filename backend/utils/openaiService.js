@@ -10,14 +10,14 @@ dotenv.config();
  * @returns {Array} Array di spot generati da AI
  */
 export const aiGeneratedSpots = async (query, options = {}) => {
-  console.log('openaai request')
+  console.log('openai request')
   // try {
   // console.log('aiGeneratedSpots chiamata con query:', query, 'e opzioni:', options);
 
   // Costruisci il prompt per OpenAI
   const { lat, lng, distance, mood, musicGenre } = options;
 
-  let prompt = `Genera 3-5 spot artistici a Roma basati sulla query: "${query}".`;
+  let prompt = `Genera 20-30 spot artistici  basati sulla query: "${query}".`;
 
 
   
@@ -34,7 +34,7 @@ export const aiGeneratedSpots = async (query, options = {}) => {
   }
   
 
-  prompt += ` Formatta i risultati come un array JSON con i seguenti campi per ogni spot: 
+  prompt += ` Ricorda i risultati devono essere reali e non fittizi ;Formatta i risultati come un array JSON con i seguenti campi per ogni spot: 
       name (nome dello spot), 
       description (descrizione dettagliata), 
       type (artwork, venue, o event), 

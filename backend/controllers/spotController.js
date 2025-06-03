@@ -1,56 +1,47 @@
 import Spot from '../models/Spot.js';
 import { aiGeneratedSpots } from '../utils/openaiService.js';
+import fetchEvents from '../utils/fetchRealEvents.js';
 import { buildSpotQuery, buildPaginationOptions } from '../utils/queryBuilder.js';
 
 // @desc    Ottieni spot in base ai parametri di ricerca
 // @route   GET /api/spots
 // @access  Public
-export const getSpots = async (req, res, next) => {
-  // console.log('getSpots called with query:', req.query);
-  try {
-    // Estrai parametri di ricerca
-    const { search, lat, lng, distance, mood, musicGenre, source } = req.query;
-    
-    // Array per i risultati combinati
-    let combinedResults = [];
-    
-    // Step 1: Ottieni risultati da OpenAI (fonte primaria)
-    // if (!source || source === 'all' || source === 'openai') {
-      const openaiResults = await aiGeneratedSpots(search, {
-        lat, lng, distance, mood, musicGenre
-      });
-      combinedResults = [...openaiResults]; // Ogni risultato ha source: 'openai'
-    // }
-    
-    /*
-    // Step 2: Ottieni risultati dal database (contenuti UGC)
-    if (!source || source === 'all' || source === 'database') {
-      // Costruisci la query utilizzando il builder
-      const query = buildSpotQuery(req.query, req.user);
-      
-      // Costruisci opzioni di paginazione
-      const options = buildPaginationOptions(req.query);
-      
-      // Esegui la query
-      const dbSpots = await Spot.find(query)
-        .skip(options.skip)
-        .limit(options.limit)
-        .sort(options.sort);
-      
-      // Assicura che ogni risultato abbia il campo source
-      const dbSpotsWithSource = dbSpots.map(spot => {
-        const spotObj = spot.toObject();
-        if (!spotObj.source) {
-          spotObj.source = 'database';
-        }
-        return spotObj;
-      });
-      
-      combinedResults = [...combinedResults, ...dbSpotsWithSource];
-    }
-    */
 
-    // Restituisci i risultati combinati
+export const getSpots = async (req, res, next) => {
+  try {
+    // Estrai parametri di ricerca dalla query string
+    const {
+      search = '',
+      category = '',      // artwork | venue | event | …
+      lat,
+      lng,
+      distance = 50,      // km
+      mood,
+      musicGenre
+    } = req.query;
+
+    /* ---------- 1) SEMPRE: spot generati da OpenAI -------------------- */
+    const openaiResults = await aiGeneratedSpots(search, {
+      lat, lng, distance, mood, musicGenre
+    });                                         // -> source: 'openai'
+
+    /* ---------- 2) EVENTBRITE (solo se non artwork/venue) ------------- */
+    let eventbriteResults = [];
+    const catLower = category.toLowerCase();
+
+    if (catLower !== 'artwork' && catLower !== 'venue') {
+      eventbriteResults = await fetchEvents({
+        query: search,
+        lat: lat && Number(lat),
+        lon: lng && Number(lng),
+        radiusKm: Number(distance),
+        page: 1                             // estendi se hai paginazione
+      });                                   // -> source: 'eventbrite'
+    }
+
+    /* ---------- 3) MERGE & RESPONSE ----------------------------------- */
+    const combinedResults = [...openaiResults, ...eventbriteResults];
+
     res.json({
       success: true,
       count: combinedResults.length,
