@@ -20,14 +20,13 @@ const MapView = ({
     zoom: zoom
   });
 
-  // Aggiorna la vista quando cambiano le props
-  useEffect(() => {
-    setViewState({
-      longitude: center[0],
-      latitude: center[1],
-      zoom: zoom
-    });
-  }, []);
+useEffect(() => {
+  setViewState({
+    longitude: center[0],
+    latitude: center[1],
+    zoom: zoom
+  });
+}, [center, zoom]);
 
   return (
     <Map
