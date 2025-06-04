@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Map from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Marker } from 'react-map-gl';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iY2tjaWt4MHJjdzJzc2F1em5scXI5aiJ9.eV_JXLtKNGzFIvsvXBV8FQ';
-
 const MapView = ({
   center = [-74.5, 40],
   zoom = 9,
   markers = [],
   onMarkerClick,
+  onMapClick,
   interactive = true,
   style = { width: '100%', height: '100%' }
 }) => {
@@ -27,12 +26,20 @@ const MapView = ({
       latitude: center[1],
       zoom: zoom
     });
-  }, []);
+  }, [center, zoom]);
+
+  // Gestisce il click sulla mappa
+  const handleMapClick = (event) => {
+    if (onMapClick && interactive) {
+      onMapClick(event);
+    }
+  };
 
   return (
     <Map
       {...viewState}
       onMove={evt => interactive && setViewState(evt.viewState)}
+      onClick={handleMapClick}
       mapStyle="mapbox://styles/mapbox/streets-v11"
       mapboxAccessToken={MAPBOX_TOKEN}
       style={style}
@@ -42,7 +49,7 @@ const MapView = ({
         let backgroundColor;
         let borderColor = 'transparent';
         let borderWidth = '0';
-
+        
         // Colore base per il tipo di spot
         if (marker.type === 'artwork') {
           backgroundColor = '#3B82F6'; // Blu per opere d'arte
@@ -53,7 +60,7 @@ const MapView = ({
         } else {
           backgroundColor = '#10B981'; // Verde per collezioni o altro
         }
-
+        
         // Aggiungi bordo distintivo in base alla fonte
         if (marker.source === 'openai') {
           borderColor = '#F59E0B'; // Bordo arancione per risultati OpenAI
@@ -62,64 +69,18 @@ const MapView = ({
           borderColor = '#06B6D4'; // Bordo azzurro per contenuti UGC
           borderWidth = '3px';
         }
-
-
-
-        // console.log(marker.coordinates[0], marker.coordinates[1])
-
-
-
-        return (
-          <Marker
-            key={marker.name}
-            longitude={marker.coordinates[0]}
-            latitude={marker.coordinates[1]}
-            anchor="center"
-            onClick={() => {
-              console.log('Marker clicked:', marker);
-              return onMarkerClick && onMarkerClick(marker)
-            }}
-            
-          >
-            <div
-              style={{
-                width: '24px',
-                height: '24px',
-                backgroundColor,
-                borderRadius: '50%',
-                borderColor,
-                borderStyle: 'solid',
-                borderWidth,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-              }}
-              title={`${marker.title || marker.name} (${marker.source === 'openai' ? 'AI' : 'UGC'})`}
-            >
-              {marker.type === 'artwork' ? 'A' : marker.type === 'venue' ? 'V' : marker.type === 'event' ? 'E' : 'C'}
-            </div>
-          </Marker>
-        );
-
-
-
-
-        /*
+        
         return (
           <div
-            key={marker.name}
+            key={marker.id || `${marker.coordinates[0]}-${marker.coordinates[1]}`}
             className="marker"
             style={{
               position: 'absolute',
               left: '0',
               top: '0',
               transform: `translate(
-          ${viewState.longitude === marker.coordinates[0] && viewState.latitude === marker.coordinates[1] ? '-50%, -50%' : '0, 0'}
-        )`,
+                ${viewState.longitude === marker.coordinates[0] && viewState.latitude === marker.coordinates[1] ? '-50%, -50%' : '0, 0'}
+              )`,
               width: '24px',
               height: '24px',
               backgroundColor,
@@ -141,14 +102,7 @@ const MapView = ({
             {marker.type === 'artwork' ? 'A' : marker.type === 'venue' ? 'V' : marker.type === 'event' ? 'E' : 'C'}
           </div>
         );
-        */
-
-
-
-
-
       })}
-
     </Map>
   );
 };
@@ -158,13 +112,14 @@ MapView.propTypes = {
   zoom: PropTypes.number,
   markers: PropTypes.arrayOf(
     PropTypes.shape({
-      // id: PropTypes.string.isRequired,
+      id: PropTypes.string,
       coordinates: PropTypes.array.isRequired,
       title: PropTypes.string,
       type: PropTypes.string
     })
   ),
   onMarkerClick: PropTypes.func,
+  onMapClick: PropTypes.func,
   interactive: PropTypes.bool,
   style: PropTypes.object
 };

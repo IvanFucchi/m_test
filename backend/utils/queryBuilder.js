@@ -1,3 +1,7 @@
+
+
+import mongoose from 'mongoose';
+
 /**
  * Costruisce una query MongoDB per la ricerca di spot
  * @param {Object} params - Parametri di ricerca
@@ -5,12 +9,52 @@
  * @returns {Object} Query MongoDB
  */
 export const buildSpotQuery = (params, user = null) => {
-  const { search, type, category, mood, musicGenre, lat, lng, distance } = params;
+  const { 
+    search, 
+    type, 
+    category, 
+    mood, 
+    musicGenre, 
+    lat, 
+    lng, 
+    distance,
+    parentId
+  } = params;
   
   // Inizializza l'oggetto query
   let query = {};
 
-  // Aggiungi condizioni di ricerca se presenti
+  // Filtra per tipo
+  if (type) {
+    query.type = type;
+  }
+
+  // Filtra per categoria
+  if (category) {
+    query.category = category;
+  }
+
+  // Filtra per mood
+  if (mood) {
+    query.mood = { $in: [mood] };
+  }
+
+  // Filtra per genere musicale
+  if (musicGenre) {
+    query.musicGenres = { $in: [musicGenre] };
+  }
+
+  // Filtra per parent (per ottenere i figli di uno spot)
+  if (parentId) {
+    query.parentId = parentId;
+  }
+
+  // Filtra per approvazione (gli admin vedono tutto)
+  if (!user || user.role !== 'admin') {
+    query.isApproved = true;
+  }
+
+  // Ricerca testuale
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -19,55 +63,29 @@ export const buildSpotQuery = (params, user = null) => {
     ];
   }
 
-  // Aggiungi filtri per tipo e categoria se presenti
-  if (type) {
-    query.type = type;
-  }
-
-  if (category) {
-    query.category = category;
-  }
-
-  // Aggiungi filtri per mood e genere musicale se presenti
-  if (mood) {
-    query.mood = { $in: [mood] };
-  }
-
-  if (musicGenre) {
-    query.musicGenres = { $in: [musicGenre] };
-  }
-
- // Aggiungi filtro geografico se presenti lat, lng e distance
-if (lat && lng && distance) {
-  try {
-    // Assicurati che i valori siano numeri
-    const longitude = parseFloat(lng);
-    const latitude = parseFloat(lat);
-    const maxDistance = parseFloat(distance) * 1000; // Converti km in metri
-    
-    // Verifica che i valori siano validi
-    if (isNaN(longitude) || isNaN(latitude) || isNaN(maxDistance)) {
-      console.error('Coordinate o distanza non valide:', { lng, lat, distance });
-    } else {
-      // Usa $geoWithin invece di $near per evitare la necessità di un indice
-      query.coordinates = {
-        $geoWithin: {
-          $centerSphere: [
-            [longitude, latitude],
-            maxDistance / 6378100 // Converti metri in radianti (raggio della Terra = 6378.1 km)
-          ]
-        }
-      };
+  // Ricerca geografica
+  if (lat && lng && distance) {
+    try {
+      // Assicurati che i valori siano numeri
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+      const maxDistance = parseFloat(distance) * 1000; // Converti km in metri
+      
+      // Verifica che i valori siano validi
+      if (!isNaN(latitude) && !isNaN(longitude) && !isNaN(maxDistance)) {
+        query['location.coordinates'] = {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [longitude, latitude]
+            },
+            $maxDistance: maxDistance
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Errore nella costruzione della query geografica:', error);
     }
-  } catch (error) {
-    console.error('Errore nella costruzione della query geografica:', error);
-  }
-}
-
-
-  // Aggiungi filtro per approvazione (mostra solo spot approvati a meno che l'utente non sia admin)
-  if (!user || user.role !== 'admin') {
-    query.isApproved = true;
   }
 
   return query;
@@ -75,20 +93,44 @@ if (lat && lng && distance) {
 
 /**
  * Costruisce opzioni di paginazione per le query MongoDB
- * @param {Object} params - Parametri di paginazione
+ * @param {Object} params - Parametri di ricerca
  * @returns {Object} Opzioni di paginazione
  */
 export const buildPaginationOptions = (params) => {
-  const { page = 1, limit = 10, sort = '-createdAt' } = params;
+  const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = params;
   
-  return {
+  const options = {
     skip: (parseInt(page) - 1) * parseInt(limit),
     limit: parseInt(limit),
-    sort
+    sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 }
   };
+  
+  return options;
+};
+
+/**
+ * Calcola la distanza in km tra due punti geografici
+ * @param {number} lat1 - Latitudine del primo punto
+ * @param {number} lon1 - Longitudine del primo punto
+ * @param {number} lat2 - Latitudine del secondo punto
+ * @param {number} lon2 - Longitudine del secondo punto
+ * @returns {number} Distanza in km
+ */
+export const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Raggio della Terra in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // Distanza in km
+  return distance;
 };
 
 export default {
   buildSpotQuery,
-  buildPaginationOptions
+  buildPaginationOptions,
+  calculateDistance
 };
