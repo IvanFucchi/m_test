@@ -179,7 +179,7 @@ const SearchInterface = () => {
               </select>
             </div>
 
-            <div>
+            {/*<div>
               <label htmlFor="mood" className="block text-sm font-medium text-gray-700 mb-1">
                 Mood
               </label>
@@ -221,6 +221,7 @@ const SearchInterface = () => {
                 <option value="folk">Folk</option>
               </select>
             </div>
+            */}
 
             <div className="md:col-span-2">
               <div className="flex items-center mb-1">

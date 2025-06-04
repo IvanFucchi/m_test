@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import LocationSearchMap from '../common/LocationSearchMap';
 
-const Navbar = () => {
+const Navbar = ({ onSearch }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -26,6 +27,8 @@ const Navbar = () => {
             />
             
           </Link>
+
+          <LocationSearchMap onSearch={onSearch} />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
