@@ -5,13 +5,13 @@ import MainLayout from './components/layout/MainLayout';
 
 // Pages
 import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import ExplorePage from './pages/ExplorePage';
 import SpotDetailPage from './pages/SpotDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import ShadLoginPage from './pages/ShadLoginPage';
 
 // Protected route component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -43,7 +43,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="login" element={<LoginPage />} />
+            <Route path="login" element={<ShadLoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="explore" element={<ExplorePage />} />
             <Route path="spots/:id" element={<SpotDetailPage />} />

@@ -14,7 +14,7 @@ const Navbar = ({ handleSearch }) => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
+    <nav className="bg-white-600 text-gray shadow-md">
       <div className="container-custom py-3">
         <div className="flex justify-between items-center">
           {/* Logo */}
@@ -32,14 +32,14 @@ const Navbar = ({ handleSearch }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="hover:text-blue-200 transition-colors">Home</Link>
-            <Link to="/explore" className="hover:text-blue-200 transition-colors">Esplora</Link>
+            <Link to="/" className="hover:text-gray-200 transition-colors">Home</Link>
+            <Link to="/explore" className="hover:text-gray-200 transition-colors">Esplora</Link>
 
             {isAuthenticated ? (
               <>
                 <div className="relative group">
                   <button
-                    className="flex items-center hover:text-blue-200 transition-colors"
+                    className="flex items-center hover:text-white-200 transition-colors"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                   >
                     <span className="mr-1">{user.name}</span>
@@ -115,7 +115,7 @@ const Navbar = ({ handleSearch }) => {
               className="block hover:text-blue-200 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Esplora
+              Explore
             </Link>
 
             {isAuthenticated ? (
@@ -159,7 +159,7 @@ const Navbar = ({ handleSearch }) => {
                 </Link>
                 <Link
                   to="/register"
-                  className="block bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors inline-block"
+                  className="block bg-white text-gray-600 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors inline-block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Registrati

@@ -6,10 +6,13 @@ const ExplorePage = () => {
 
   return (
     <div className="w-full h-screen flex flex-col">
+      {/*
       <header className="p-4 bg-white shadow z-10 flex justify-between items-center">
         <h1 className="text-xl font-semibold">Esplora gli spot artistici</h1>
       </header>
+      */}
 
+      
       <div className="flex-1">
         <MapView
           center={context.center}
