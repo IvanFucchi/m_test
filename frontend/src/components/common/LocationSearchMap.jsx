@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button"
+
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iY2tjaWt4MHJjdzJzc2F1em5scXI5aiJ9.eV_JXLtKNGzFIvsvXBV8FQ';
 
 
@@ -41,6 +44,7 @@ const LocationSearchMap = ({ onSearch: propSearch }) => {
   return (
     <div className="flex items-center gap-2 text-gray-700">
       <div className="relative">
+        {/*
         <input
           type="text"
           value={searchText}
@@ -48,6 +52,15 @@ const LocationSearchMap = ({ onSearch: propSearch }) => {
           placeholder="Search for a city..."
           className="border p-2 rounded w-full sm:w-80"
         />
+        */}
+
+        <Input
+          type="text"
+          value={searchText}
+          onChange={handleInputChange}
+          placeholder="Search for a city..."
+        />
+
         {suggestions.length > 0 && (
           <ul className="bg-white border rounded shadow max-h-64 overflow-y-auto absolute top-12 left-0 w-full z-20">
             {suggestions.map((place) => (
@@ -62,15 +75,13 @@ const LocationSearchMap = ({ onSearch: propSearch }) => {
           </ul>
         )}
       </div>
-      <button
-        onClick={useMyLocation}
-        className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-      >
-        Use My Location
-      </button>
+      <Button
+        variant="outline"
+        onClick={useMyLocation}>
+        use my location
+      </Button>
     </div>
   );
 };
 
 export default LocationSearchMap;
- 
