@@ -104,7 +104,9 @@ export const loginUser = async (req, res, next) => {
 // @access  Public
 export const verifyEmail = async (req, res, next) => {
   try {
-    const { token } = req.params;
+        const token = req.query.token;
+    
+    console.log('Token ricevuto:', token); // Per debug
     
     const user = await User.findOne({
       confirmationToken: token,

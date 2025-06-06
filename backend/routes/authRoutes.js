@@ -29,7 +29,7 @@ router.get('/verify', verifyToken);
 router.get('/logout', logoutUser);
 
 // Verifica email
-router.get('/verify-email/:token', verifyEmail);
+router.get('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerificationEmail);
 
 // Reset password
