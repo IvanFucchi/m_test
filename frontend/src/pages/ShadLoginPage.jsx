@@ -1,12 +1,40 @@
-// src/components/shad-ui/login-01/page.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardContent, CardFooter } from "ui/card";
 import { Input } from "ui/input";
 import { Button } from "ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "../context/AuthContext";
 import bgImage from "@/assets/1caverna_chauvet_.png"; 
 
 export default function Login01Page() {
+    const { login, loginWithGoogle, isAuthenticated } = useAuth();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const navigate = useNavigate();
+    
+    // Reindirizza se l'utente è già autenticato
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate]);
+    
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        
+        try {
+            await login(email, password);
+            // Reindirizzamento gestito dal contesto di autenticazione
+        } catch (error) {
+            console.error("Errore durante il login:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    
     return (
         <div className="flex min-h-screen">
             {/* Lato sinistro - form di login */}
@@ -23,7 +51,7 @@ export default function Login01Page() {
                     Enter your email below to login to your account
                 </p>
                 {/* Form */}
-                <div className="space-y-4 w-full max-w-sm">
+                <form onSubmit={handleLogin} className="space-y-4 w-full max-w-sm">
                     <div className="flex flex-col">
                         <label htmlFor="email" className="text-sm font-medium mb-1">
                             Email
@@ -33,6 +61,9 @@ export default function Login01Page() {
                             type="email"
                             placeholder="m@example.com"
                             className="bg-gray-800 text-white border-gray-700"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="flex flex-col">
@@ -49,18 +80,30 @@ export default function Login01Page() {
                             type="password"
                             placeholder="••••••••"
                             className="bg-gray-800 text-white border-gray-700"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </div>
-                    <Button className="w-full bg-white text-black hover:bg-gray-200">
-                        Login
+                    <Button 
+                        type="submit"
+                        className="w-full bg-white text-black hover:bg-gray-200"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? "Logging in..." : "Login"}
                     </Button>
                     <div className="relative flex items-center">
                         <div className="flex-grow border-t border-gray-600" />
                         <span className="mx-3 text-xs text-gray-400 uppercase">Or continue with</span>
                         <div className="flex-grow border-t border-gray-600" />
                     </div>
-                    <Button variant="outline" className="w-full text-white border-gray-600 hover:border-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <Button 
+                        type="button"
+                        variant="outline" 
+                        className="w-full text-white border-gray-600 hover:border-gray-500"
+                        onClick={loginWithGoogle}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 mr-2">
                             <path
                                 d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
                                 fill="currentColor"
@@ -74,16 +117,16 @@ export default function Login01Page() {
                             Sign up
                         </a>
                     </p>
-                </div>
+                </form>
             </div>
 
-            
             <div className="w-1/2 bg-gray-800">
                 <img
                     src={bgImage}
                     alt="Illustrazione login"
                     className="w-full h-full object-cover"
-                /></div>
+                />
+            </div>
         </div>
-    );
+     );
 }

@@ -1,8 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import morgan from 'morgan';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
+import passport from './config/passport.js';
+import session from 'express-session';
+// import authRoutes from './routes/authRoutes.js';
+import morgan from 'morgan';
+
 import { notFound, errorHandler, validationErrorHandler, authErrorHandler } from './middleware/errorHandler.js';
 
 /*
@@ -31,10 +35,11 @@ import authRoutes from './routes/authRoutes.js';
 import spotRoutes from './routes/spotRoutes.js';
 import ugcRoutes from './routes/ugcRoutes.js';
 
-// Carica le variabili d'ambiente
+
 dotenv.config();
 
-// Inizializza Express
+connectDB();
+
 const app = express();
 
 // Configurazione CORS avanzata
@@ -56,6 +61,25 @@ app.use(cors(corsOptions ));
 // Middleware di base
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+
+
+// Configurazione sessione per Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'musa-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// Inizializza Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
+
+
 
 // Logging in modalità sviluppo
 if (process.env.NODE_ENV !== 'production') {

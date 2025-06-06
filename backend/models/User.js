@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -18,7 +19,10 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'La password è obbligatoria'],
+    required: function() {
+      // La password è richiesta solo se non si sta usando l'autenticazione OAuth
+      return !this.googleId;
+    },
     minlength: [6, 'La password deve essere di almeno 6 caratteri']
   },
   role: {
@@ -34,6 +38,23 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  // Campi per OAuth Google
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true // Permette valori null/undefined e mantiene l'unicità solo per valori esistenti
+  },
+  // Campi per verifica email
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
+  confirmationToken: {
+    type: String
+  },
+  confirmationTokenExpires: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -41,7 +62,13 @@ const userSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  resetPasswordToken: {
+  type: String
+},
+resetPasswordExpires: {
+  type: Date
+}
 }, {
   timestamps: true
 });
@@ -64,14 +91,25 @@ userSchema.methods.generateAuthToken = function() {
 
 // Metodo per confrontare password
 userSchema.methods.matchPassword = async function(enteredPassword) {
+  if (!this.password) {
+    return false; // Se non c'è password (utente OAuth), non può fare match
+  }
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Metodo per generare token di conferma email
+userSchema.methods.generateConfirmationToken = function() {
+  this.confirmationToken = crypto.randomBytes(32).toString('hex');
+  this.confirmationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 ore
+  return this.confirmationToken;
 };
 
 // Middleware pre-save per hash della password
 userSchema.pre('save', async function(next) {
   // Esegui hash solo se la password è stata modificata
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     next();
+    return;
   }
   
   const salt = await bcrypt.genSalt(10);

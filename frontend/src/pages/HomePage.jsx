@@ -17,7 +17,7 @@ const HomePage = () => {
               Inizia a esplorare
             </Link>
             <Link to="/register" className="btn bg-blue-700 hover:bg-blue-800 px-8 py-3 rounded-md font-medium">
-              Registrati
+              Registratiaaaaa
             </Link>
           </div>
         </div>

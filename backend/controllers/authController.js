@@ -1,6 +1,9 @@
+// backend/controllers/authController.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/User.js';
+import { sendConfirmationEmail, sendPasswordResetEmail } from '../utils/emailService.js';
 
 // @desc    Registra un nuovo utente
 // @route   POST /api/auth/register
@@ -25,14 +28,22 @@ export const registerUser = async (req, res, next) => {
     });
 
     if (user) {
+      // Genera token di conferma
+      const confirmationToken = user.generateConfirmationToken();
+      await user.save();
+      
+      // Invia email di conferma
+      await sendConfirmationEmail(user);
+      
       res.status(201).json({
         success: true,
+        message: 'Utente registrato con successo. Controlla la tua email per confermare l\'account.',
         user: {
           _id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role,
-          token: user.generateAuthToken()
+          role: user.role
+          // Non inviamo il token JWT qui perché l'utente deve prima verificare l'email
         }
       });
     } else {
@@ -66,6 +77,12 @@ export const loginUser = async (req, res, next) => {
       res.status(401);
       throw new Error('Email o password non validi');
     }
+    
+    // Verifica se l'email è stata confermata (salta per utenti Google)
+    if (!user.isEmailVerified && !user.googleId) {
+      res.status(401);
+      throw new Error('Per favore, verifica la tua email prima di accedere');
+    }
 
     res.json({
       success: true,
@@ -76,6 +93,137 @@ export const loginUser = async (req, res, next) => {
         role: user.role,
         token: user.generateAuthToken()
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verifica email utente
+// @route   GET /api/auth/verify-email/:token
+// @access  Public
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+    
+    const user = await User.findOne({
+      confirmationToken: token,
+      confirmationTokenExpires: { $gt: Date.now() }
+    });
+    
+    if (!user) {
+      res.status(400);
+      throw new Error('Token di verifica non valido o scaduto');
+    }
+    
+    // Aggiorna l'utente
+    user.isEmailVerified = true;
+    user.confirmationToken = undefined;
+    user.confirmationTokenExpires = undefined;
+    await user.save();
+    
+    res.json({
+      success: true,
+      message: 'Email verificata con successo. Ora puoi accedere al tuo account.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Richiedi nuovo token di verifica email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+export const resendVerificationEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      res.status(404);
+      throw new Error('Utente non trovato');
+    }
+    
+    if (user.isEmailVerified) {
+      res.status(400);
+      throw new Error('Email già verificata');
+    }
+    
+    // Genera nuovo token di conferma
+    const confirmationToken = user.generateConfirmationToken();
+    await user.save();
+    
+    // Invia email di conferma
+    await sendConfirmationEmail(user);
+    
+    res.json({
+      success: true,
+      message: 'Email di verifica inviata con successo'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Richiedi reset password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      res.status(404);
+      throw new Error('Utente non trovato');
+    }
+    
+    // Genera token di reset password
+    user.resetPasswordToken = crypto.randomBytes(32).toString('hex');
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
+    await user.save();
+    
+    // Invia email di reset password
+    await sendPasswordResetEmail(user);
+    
+    res.json({
+      success: true,
+      message: 'Email di reset password inviata con successo'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset password
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+    
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+    
+    if (!user) {
+      res.status(400);
+      throw new Error('Token di reset password non valido o scaduto');
+    }
+    
+    // Aggiorna password
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    
+    res.json({
+      success: true,
+      message: 'Password aggiornata con successo'
     });
   } catch (error) {
     next(error);
@@ -98,7 +246,9 @@ export const getUserProfile = async (req, res, next) => {
           email: user.email,
           role: user.role,
           bio: user.bio,
-          avatar: user.avatar
+          avatar: user.avatar,
+          googleId: user.googleId,
+          isEmailVerified: user.isEmailVerified
         }
       });
     } else {
@@ -119,10 +269,25 @@ export const updateUserProfile = async (req, res, next) => {
 
     if (user) {
       user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
+      
+      // Se l'email è cambiata, richiedi una nuova verifica
+      if (req.body.email && req.body.email !== user.email) {
+        user.email = req.body.email;
+        user.isEmailVerified = false;
+        
+        // Genera token di conferma
+        const confirmationToken = user.generateConfirmationToken();
+        
+        // Invia email di conferma
+        await sendConfirmationEmail(user);
+      }
+      
       user.bio = req.body.bio || user.bio;
       user.avatar = req.body.avatar || user.avatar;
 
+      // Aggiorna la password solo se:
+      // 1. È stata fornita una nuova password
+      // 2. Non è un account Google (o l'utente vuole impostare una password locale)
       if (req.body.password) {
         user.password = req.body.password;
       }
@@ -138,6 +303,8 @@ export const updateUserProfile = async (req, res, next) => {
           role: updatedUser.role,
           bio: updatedUser.bio,
           avatar: updatedUser.avatar,
+          googleId: updatedUser.googleId,
+          isEmailVerified: updatedUser.isEmailVerified,
           token: updatedUser.generateAuthToken()
         }
       });
@@ -148,6 +315,16 @@ export const updateUserProfile = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+// @desc    Gestisce il logout (principalmente per frontend)
+// @route   GET /api/auth/logout
+// @access  Public
+export const logoutUser = (req, res) => {
+  res.json({
+    success: true,
+    message: 'Logout effettuato con successo'
+  });
 };
 
 // @desc    Verifica token JWT
@@ -181,8 +358,10 @@ export const verifyToken = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        bio: user.bio,
-        avatar: user.avatar
+        bio: user.bio || '',
+        avatar: user.avatar || '',
+        googleId: user.googleId,
+        isEmailVerified: user.isEmailVerified
       }
     });
   } catch (error) {
@@ -195,3 +374,6 @@ export const verifyToken = async (req, res, next) => {
     next(error);
   }
 };
+
+
+

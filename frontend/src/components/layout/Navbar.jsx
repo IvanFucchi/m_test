@@ -17,16 +17,17 @@ const Navbar = ({ handleSearch }) => {
     <nav className="bg-white-600 text-gray shadow-md">
       <div className="container-custom py-3">
         <div className="flex justify-between items-center">
-          {/* Logo */}
-          {/* <Link to="/" className="text-2xl font-bold">MUSA</Link> */}
-          <Link to="/" className="flex items-center">
-            <img
-              src="/images/logo.png"
-              alt="MUSA Logo"
-              className="h-24"
-            />
+          <div className="flex items-center">
             
-          </Link>
+            {/* Logo */}
+            <Link to="/" className="flex items-center">
+              <img
+                src="/images/logo.png"
+                alt="MUSA Logo"
+                className="h-24"
+              />
+            </Link>
+          </div>
 
           <LocationSearchMap onSearch={handleSearch} />
 
@@ -83,8 +84,7 @@ const Navbar = ({ handleSearch }) => {
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:text-blue-200 transition-colors">Accedi</Link>
-                <Link to="/register" className="bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors">Registrati</Link>
+                <Link to="/login" className="hover:text-blue-200 transition-colors">Login</Link>
               </>
             )}
           </div>
@@ -155,15 +155,9 @@ const Navbar = ({ handleSearch }) => {
                   className="block hover:text-blue-200 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Accedi
+                  Login
                 </Link>
-                <Link
-                  to="/register"
-                  className="block bg-white text-gray-600 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors inline-block"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Registrati
-                </Link>
+
               </>
             )}
           </div>
