@@ -28,7 +28,7 @@ export const sendConfirmationEmail = async (user) => {
     
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     console.log('Frontend URL:', frontendUrl );
-    /*****/
+    /**** */
     const confirmationUrl = `${frontendUrl}/verify-email?token=${user.confirmationToken}`;
     console.log('URL di conferma:', confirmationUrl);
     

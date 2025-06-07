@@ -66,7 +66,7 @@ const App = () => {
             <Route path="register" element={<RegisterPage />} />
             <Route path="explore" element={<ExplorePage />} />
             <Route path="/oauth-callback" element={<OAuthCallback />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/verify-email" element={<VerifyEmail />} /> {/* */}
             {/* Dynamic route for spot details */}
             <Route path="spots/:id" element={<SpotDetailPage />} />
             

@@ -31,10 +31,10 @@ export const registerUser = async (req, res, next) => {
       // Genera token di conferma
       const confirmationToken = user.generateConfirmationToken();
       await user.save();
-      
+
       // Invia email di conferma
       await sendConfirmationEmail(user);
-      
+
       res.status(201).json({
         success: true,
         message: 'Utente registrato con successo. Controlla la tua email per confermare l\'account.',
@@ -77,7 +77,7 @@ export const loginUser = async (req, res, next) => {
       res.status(401);
       throw new Error('Email o password non validi');
     }
-    
+
     // Verifica se l'email è stata confermata (salta per utenti Google)
     if (!user.isEmailVerified && !user.googleId) {
       res.status(401);
@@ -104,26 +104,25 @@ export const loginUser = async (req, res, next) => {
 // @access  Public
 export const verifyEmail = async (req, res, next) => {
   try {
-        const token = req.query.token;
-    
+    const token = req.query.token;
     console.log('Token ricevuto:', token); // Per debug
-    
+
     const user = await User.findOne({
       confirmationToken: token,
       confirmationTokenExpires: { $gt: Date.now() }
     });
-    
+
     if (!user) {
       res.status(400);
       throw new Error('Token di verifica non valido o scaduto');
     }
-    
+
     // Aggiorna l'utente
     user.isEmailVerified = true;
     user.confirmationToken = undefined;
     user.confirmationTokenExpires = undefined;
     await user.save();
-    
+
     res.json({
       success: true,
       message: 'Email verificata con successo. Ora puoi accedere al tuo account.'
@@ -139,26 +138,26 @@ export const verifyEmail = async (req, res, next) => {
 export const resendVerificationEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
-    
+
     const user = await User.findOne({ email });
-    
+
     if (!user) {
       res.status(404);
       throw new Error('Utente non trovato');
     }
-    
+
     if (user.isEmailVerified) {
       res.status(400);
       throw new Error('Email già verificata');
     }
-    
+
     // Genera nuovo token di conferma
     const confirmationToken = user.generateConfirmationToken();
     await user.save();
-    
+
     // Invia email di conferma
     await sendConfirmationEmail(user);
-    
+
     res.json({
       success: true,
       message: 'Email di verifica inviata con successo'
@@ -174,22 +173,22 @@ export const resendVerificationEmail = async (req, res, next) => {
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-    
+
     const user = await User.findOne({ email });
-    
+
     if (!user) {
       res.status(404);
       throw new Error('Utente non trovato');
     }
-    
+
     // Genera token di reset password
     user.resetPasswordToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
-    
+
     // Invia email di reset password
     await sendPasswordResetEmail(user);
-    
+
     res.json({
       success: true,
       message: 'Email di reset password inviata con successo'
@@ -206,23 +205,23 @@ export const resetPassword = async (req, res, next) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
-    
+
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }
     });
-    
+
     if (!user) {
       res.status(400);
       throw new Error('Token di reset password non valido o scaduto');
     }
-    
+
     // Aggiorna password
     user.password = password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
-    
+
     res.json({
       success: true,
       message: 'Password aggiornata con successo'
@@ -271,19 +270,19 @@ export const updateUserProfile = async (req, res, next) => {
 
     if (user) {
       user.name = req.body.name || user.name;
-      
+
       // Se l'email è cambiata, richiedi una nuova verifica
       if (req.body.email && req.body.email !== user.email) {
         user.email = req.body.email;
         user.isEmailVerified = false;
-        
+
         // Genera token di conferma
         const confirmationToken = user.generateConfirmationToken();
-        
+
         // Invia email di conferma
         await sendConfirmationEmail(user);
       }
-      
+
       user.bio = req.body.bio || user.bio;
       user.avatar = req.body.avatar || user.avatar;
 
@@ -335,24 +334,24 @@ export const logoutUser = (req, res) => {
 export const verifyToken = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    
+
     if (!token) {
       return res.status(401).json({
         success: false,
         message: 'Token non fornito'
       });
     }
-    
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select('-password');
-    
+
     if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Utente non trovato'
       });
     }
-    
+
     res.json({
       success: true,
       user: {

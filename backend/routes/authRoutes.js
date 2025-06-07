@@ -28,7 +28,7 @@ router.get('/verify', verifyToken);
 // Logout
 router.get('/logout', logoutUser);
 
-// Verifica email
+// Verifica email !!!!!!!
 router.get('/verify-email', verifyEmail);
 router.post('/resend-verification', resendVerificationEmail);
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const VerifyEmail = ( ) => {
@@ -18,18 +18,22 @@ const VerifyEmail = ( ) => {
           return;
         }
         
+        console.log('Token di verifica:', token); // Per debug ***
+
         const { data } = await axios.get(`http://localhost:5000/api/auth/verify-email/${token}` );
         
         if (data.success) {
           setStatus('success');
-          setMessage(data.message);
-          
+          setMessage(data.message || 'Email verificata con successo!');
+
+
           // Reindirizza alla pagina di login dopo 3 secondi
           setTimeout(() => {
             navigate('/login');
           }, 3000);
         }
       } catch (error) {
+        
         setStatus('error');
         setMessage(error.response?.data?.message || 'Errore durante la verifica dell\'email');
       }
