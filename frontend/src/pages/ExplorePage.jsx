@@ -1,17 +1,28 @@
-import React from 'react';
-import SearchInterface from '../components/common/SearchInterface';
+import MapView from '../components/common/MapView';
+import { useOutletContext } from 'react-router-dom';
 
 const ExplorePage = () => {
+  const context = useOutletContext();
+
   return (
-    <div>
-      <h1 className="page-title">Esplora gli spot artistici</h1>
-      <p className="text-gray-600 mb-6">
-        Cerca opere d'arte, musei, gallerie ed eventi culturali in base al tuo mood, ai tuoi gusti musicali o alla tua posizione.
-      </p>
+    <div className="w-full h-screen flex flex-col">
+      {/*
+      <header className="p-4 bg-white shadow z-10 flex justify-between items-center">
+        <h1 className="text-xl font-semibold">Esplora gli spot artistici</h1>
+      </header>
+      */}
+
       
-      <SearchInterface />
+      <div className="flex-1">
+        <MapView
+          center={context.center}
+          zoom={context.zoom}
+          markers={context.markers}
+          onMarkerClick={(marker) => alert(`Clicked marker: ${marker.name}`)}
+        />
+      </div>
     </div>
   );
 };
 
-export default ExplorePage;
+export default ExplorePage; 

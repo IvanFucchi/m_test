@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 import Card from '../ui/Card';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
 import Alert from '../ui/Alert';
-import MapView from './MapView'; // Assicurati di avere un componente MapView per la mappa
+import MapView from './MapView';
+import SearchBar from '../search/SearchBar';
+import FilterDrawer from '../search/FilterDrawer';
 
 const SearchInterface = () => {
   const [searchParams, setSearchParams] = useState({
@@ -23,6 +23,7 @@ const SearchInterface = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userLocation, setUserLocation] = useState(null);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
   // Ottieni la posizione dell'utente
@@ -42,26 +43,37 @@ const SearchInterface = () => {
     }
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleSearchBarQuery = ({ query }) => {
+    if (query) {
+      setSearchParams(prev => ({
+        ...prev,
+        query
+      }));
+      
+      // Esegui la ricerca automaticamente quando l'utente seleziona un suggerimento
+      handleSearch();
+    }
+  };
+
+  const handleFiltersChange = (newFilters) => {
     setSearchParams(prev => ({
       ...prev,
-      [name]: value
+      ...newFilters
     }));
   };
 
-  const handleUseLocation = () => {
-    if (userLocation) {
+  const handleLocationChange = ({ center, zoom }) => {
+    if (center && center.length === 2) {
       setSearchParams(prev => ({
         ...prev,
-        lat: userLocation.lat,
-        lng: userLocation.lng
+        lng: center[0],
+        lat: center[1]
       }));
     }
   };
 
   const handleSearch = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     setError('');
 
@@ -83,7 +95,7 @@ const SearchInterface = () => {
       }
 
       // Esegui la ricerca
-      const { data } = await axios.get(`http://localhost:5000/api/spots?${queryParams.toString()}`);
+      const { data } = await api.get(`http://localhost:5000/api/spots?${queryParams.toString()}`);
 
       if (data.success) {
         setResults(data.data);
@@ -118,171 +130,35 @@ const SearchInterface = () => {
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Cerca spot artistici</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Explore Art Spots</h2>
+          <div className="flex items-center space-x-4">
+            <SearchBar 
+              onSearch={handleSearchBarQuery} 
+              onOpenFilters={() => setIsFilterDrawerOpen(true)}
+            />
+          </div>
+        </div>
 
         {error && <Alert type="error" message={error} className="mb-4" />}
-
-        <form onSubmit={handleSearch} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="query" className="block text-sm font-medium text-gray-700 mb-1">
-                Ricerca testuale
-              </label>
-              <Input
-                type="text"
-                id="query"
-                name="query"
-                value={searchParams.query}
-                onChange={handleChange}
-                placeholder="Nome, descrizione, tag..."
-              />
-            </div>
-
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={searchParams.type}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Tutti i tipi</option>
-                <option value="artwork">Opera d'arte</option>
-                <option value="venue">Luogo</option>
-                <option value="collection">Collezione</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                Categoria
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={searchParams.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Tutte le categorie</option>
-                <option value="painting">Pittura</option>
-                <option value="sculpture">Scultura</option>
-                <option value="photography">Fotografia</option>
-                <option value="installation">Installazione</option>
-                <option value="museum">Museo</option>
-                <option value="gallery">Galleria</option>
-                <option value="event">Evento</option>
-                <option value="other">Altro</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="mood" className="block text-sm font-medium text-gray-700 mb-1">
-                Mood
-              </label>
-              <select
-                id="mood"
-                name="mood"
-                value={searchParams.mood}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Tutti i mood</option>
-                <option value="calm">Calmo</option>
-                <option value="energetic">Energetico</option>
-                <option value="melancholic">Malinconico</option>
-                <option value="joyful">Gioioso</option>
-                <option value="mysterious">Misterioso</option>
-                <option value="romantic">Romantico</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="musicGenre" className="block text-sm font-medium text-gray-700 mb-1">
-                Genere Musicale
-              </label>
-              <select
-                id="musicGenre"
-                name="musicGenre"
-                value={searchParams.musicGenre}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Tutti i generi</option>
-                <option value="classical">Classica</option>
-                <option value="jazz">Jazz</option>
-                <option value="rock">Rock</option>
-                <option value="pop">Pop</option>
-                <option value="electronic">Elettronica</option>
-                <option value="hiphop">Hip Hop</option>
-                <option value="folk">Folk</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2">
-              <div className="flex items-center mb-1">
-                <label htmlFor="distance" className="block text-sm font-medium text-gray-700">
-                  Distanza (km)
-                </label>
-                <div className="ml-auto">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleUseLocation}
-                    disabled={!userLocation}
-                  >
-                    {searchParams.lat && searchParams.lng ? 'Posizione attiva' : 'Usa la mia posizione'}
-                  </Button>
-                </div>
-              </div>
-              <input
-                type="range"
-                id="distance"
-                name="distance"
-                min="1"
-                max="50"
-                value={searchParams.distance}
-                onChange={handleChange}
-                disabled={!searchParams.lat || !searchParams.lng}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>1 km</span>
-                <span>{searchParams.distance} km</span>
-                <span>50 km</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClear}
-            >
-              Cancella
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              loading={loading}
-            >
-              Cerca
-            </Button>
-          </div>
-        </form>
       </Card>
+
+      {/* Filtri laterali */}
+      <FilterDrawer 
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={searchParams}
+        onFiltersChange={handleFiltersChange}
+        onApplyFilters={handleSearch}
+        userLocation={userLocation}
+      />
 
       <div className="flex">
         <div className="w-1/2">
           {/* Risultati */}
           {results.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Risultati ({results.length})</h2>
+              <h2 className="text-xl font-semibold mb-4">Results ({results.length})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {results.map((spot, index) => (
                   <Card
@@ -299,26 +175,23 @@ const SearchInterface = () => {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-gray-500">Nessuna immagine</span>
+                          <span className="text-gray-500">No image</span>
                         </div>
                       )}
-                      {/* Esempio semplificato */}
                       <div className="absolute top-2 left-2 flex space-x-2">
                         <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-                          {spot.type === 'artwork' ? 'Opera' : spot.type === 'venue' ? 'Luogo' : 'Collezione'}
+                          {spot.type === 'artwork' ? 'Artwork' : spot.type === 'venue' ? 'Venue' : 'Collection'}
                         </span>
                         {spot.category && (
                           <span className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-full">
                             {spot.category}
                           </span>
                         )}
-                        {/* Badge per la fonte del risultato */}
                         <span className={`px-2 py-1 text-white text-xs font-medium rounded-full ${spot.source === 'openai' ? 'bg-amber-500' : 'bg-cyan-500'
                           }`}>
                           {spot.source === 'openai' ? 'AI' : 'UGC'}
                         </span>
                       </div>
-
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-lg mb-1">{spot.name}</h3>
@@ -331,7 +204,6 @@ const SearchInterface = () => {
                         {spot.description}
                       </p>
 
-                      {/* Tags, mood, generi musicali */}
                       <div className="flex flex-wrap gap-1">
                         {spot.mood && spot.mood.slice(0, 2).map((m, i) => (
                           <span key={`mood-${i}`} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -353,18 +225,20 @@ const SearchInterface = () => {
 
           {results.length === 0 && !loading && searchParams.query && (
             <div className="text-center py-8">
-              <p className="text-gray-500">Nessun risultato trovato</p>
-              <p className="mt-2">Prova a modificare i parametri di ricerca</p>
+              <p className="text-gray-500">No results found</p>
+              <p className="mt-2">Try modifying your search parameters</p>
             </div>
           )}
         </div>
 
         <div className="w-1/2">
-          <MapView markers={results} center={[searchParams.lng, searchParams.lat]} />
+          <MapView 
+            markers={results} 
+            center={[searchParams.lng, searchParams.lat]} 
+            onMapMove={handleLocationChange}
+          />
         </div>
       </div>
-
-
     </div>
   );
 };

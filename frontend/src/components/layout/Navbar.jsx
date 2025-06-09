@@ -1,173 +1,126 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import LocationSearchMap from '../common/LocationSearchMap';
+import SearchBar from '../search/SearchBar';
+import FilterDrawer from '../search/FilterDrawer';
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+  navigationMenuTriggerStyle,
+} from '../shad-ui/navigation-menu';
+import { Avatar, AvatarImage, AvatarFallback } from '../shad-ui/avatar';
+import { ChevronDown } from 'lucide-react';
 
-const Navbar = () => {
+export default function Navbar({ handleTextSearch, handleLocationSearch }) {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
+  const handleSearchQuery = (query) => {
+    // Passa la query di ricerca al componente genitore
+    if (handleTextSearch && query && query.query) {
+      handleTextSearch(query.query);
+    }
+  };
+
+  const handleOpenFilters = () => {
+    setIsFilterDrawerOpen(true);
+    // Emetti un evento personalizzato per aprire il drawer dei filtri
+    const event = new CustomEvent('openSearchFilters');
+    window.dispatchEvent(event);
+  };
+
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
-      <div className="container-custom py-3">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          {/* <Link to="/" className="text-2xl font-bold">MUSA</Link> */}
-          <Link to="/" className="flex items-center">
-            <img
-              src="/images/logo.png"
-              alt="MUSA Logo"
-              className="h-24"
-            />
-            
-          </Link>
+    <nav className="bg-zinc-950 text-white shadow-md">
+      <div className="container-custom py-3 flex items-center justify-between">
+        <Link to="/">
+          <img src="/images/logo.png" alt="MUSA Logo" className="h-24" />
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="hover:text-blue-200 transition-colors">Home</Link>
-            <Link to="/explore" className="hover:text-blue-200 transition-colors">Esplora</Link>
-
-            {isAuthenticated ? (
-              <>
-                <div className="relative group">
-                  <button
-                    className="flex items-center hover:text-blue-200 transition-colors"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  >
-                    <span className="mr-1">{user.name}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {isMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                      <Link
-                        to="/profile"
-                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Profilo
-                      </Link>
-
-                      {user.role === 'admin' && (
-                        <Link
-                          to="/admin"
-                          className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Dashboard Admin
-                        </Link>
-                      )}
-
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="hover:text-blue-200 transition-colors">Accedi</Link>
-                <Link to="/register" className="bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors">Registrati</Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden flex items-center"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+        <div className="flex items-center space-x-4">
+          <SearchBar 
+            onSearch={handleSearchQuery} 
+            onOpenFilters={handleOpenFilters}
+          />
+          <LocationSearchMap onSearch={handleLocationSearch} />
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-3 pb-3 space-y-3">
-            <Link
-              to="/"
-              className="block hover:text-blue-200 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/explore"
-              className="block hover:text-blue-200 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Esplora
-            </Link>
+        {/* Shadcn NavigationMenu */}
+        <NavigationMenu>
+          <NavigationMenuList className="flex items-center space-x-4">
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link to="/" className="px-3 py-2 rounded hover:bg-zinc-800">Home</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                <Link to="/explore" className="px-3 py-2 rounded hover:bg-zinc-800">Esplora</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
 
             {isAuthenticated ? (
-              <>
-                <Link
-                  to="/profile"
-                  className="block hover:text-blue-200 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Profilo
-                </Link>
-
-                {user.role === 'admin' && (
-                  <Link
-                    to="/admin"
-                    className="block hover:text-blue-200 transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Dashboard Admin
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="flex items-center px-3 py-2 rounded hover:bg-zinc-800 group">
+                  <span className="text-base mr-1">{user.name}</span>
+                  <Link to="/profile" className="ml-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.photoURL ?? user.avatar} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
                   </Link>
-                )}
-
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    handleLogout();
-                  }}
-                  className="block w-full text-left hover:text-blue-200 transition-colors"
-                >
-                  Logout
-                </button>
-              </>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="absolute bg-zinc-800 w-48 rounded-md shadow-lg border border-zinc-700">
+                  <ul className="py-2">
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link to="/profile" className="block px-4 py-2 hover:bg-zinc-700">Profilo</Link>
+                      </NavigationMenuLink>
+                    </li>
+                    {user.role === 'admin' && (
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link to="/admin" className="block px-4 py-2 hover:bg-zinc-700">Dashboard Admin</Link>
+                        </NavigationMenuLink>
+                      </li>
+                    )}
+                    <li>
+                      <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-zinc-700">Logout</button>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="block hover:text-blue-200 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Accedi
-                </Link>
-                <Link
-                  to="/register"
-                  className="block bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition-colors inline-block"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Registrati
-                </Link>
-              </>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                  <Link to="/login" className="px-3 py-2 rounded hover:bg-zinc-800">Login</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
             )}
-          </div>
-        )}
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
+      
+      {/* Drawer dei filtri */}
+      <FilterDrawer 
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        onApplyFilters={(filters) => {
+          if (handleTextSearch && filters.query) {
+            handleTextSearch(filters.query);
+          }
+        }}
+      />
     </nav>
   );
-};
-
-export default Navbar;
+}
