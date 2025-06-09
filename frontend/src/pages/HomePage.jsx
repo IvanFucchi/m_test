@@ -5,7 +5,7 @@ const HomePage = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-blue-600 text-white py-16 rounded-lg mb-12">
+      <section className="bg-zinc-800 text-white py-16 rounded-lg mb-12">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Scopri l'arte in base al tuo mood</h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
@@ -13,11 +13,11 @@ const HomePage = () => {
             in base al tuo stato d'animo e ai tuoi gusti musicali.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/explore" className="btn bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-md font-medium">
+            <Link to="/explore" className="btn bg-zinc-950 text-amber-600 hover:bg-slate-800 px-8 py-3 rounded-md font-medium">
               Inizia a esplorare
             </Link>
-            <Link to="/register" className="btn bg-blue-700 hover:bg-blue-800 px-8 py-3 rounded-md font-medium">
-              Registratiaaaaa
+            <Link to="/register" className="btn bg-zinc-950 text-amber-600  hover:bg-slate-800 px-8 py-3 rounded-md font-medium">
+              Registrati
             </Link>
           </div>
         </div>
@@ -25,7 +25,7 @@ const HomePage = () => {
 
       {/* Features Section */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Come funziona MUSA</h2>
+        <h2 className="text-3xl text-white font-bold text-center mb-12">Come funziona MUSA</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="bg-blue-100 text-blue-600 w-12 h-12 flex items-center justify-center rounded-full mb-4">
@@ -68,7 +68,7 @@ const HomePage = () => {
 
       {/* Categories Section */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Esplora per categoria</h2>
+        <h2 className="text-3xl text-white font-bold text-center mb-12">Esplora per categoria</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-blue-50 p-6 rounded-lg text-center hover:bg-blue-100 transition-colors">
             <h3 className="text-lg font-semibold mb-2">Opere d'arte</h3>
@@ -98,7 +98,7 @@ const HomePage = () => {
         <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
           Registrati gratuitamente e inizia a esplorare opere d'arte e luoghi culturali in base al tuo mood e ai tuoi gusti musicali.
         </p>
-        <Link to="/register" className="btn btn-primary px-8 py-3 rounded-md font-medium">
+        <Link to="/register" className="btn bg-zinc-950 text-amber-600  hover:bg-slate-800 px-8 py-3 rounded-md font-medium">
           Crea un account
         </Link>
       </section>

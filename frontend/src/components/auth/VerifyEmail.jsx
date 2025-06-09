@@ -1,93 +1,71 @@
-// frontend/src/components/auth/VerifyEmail.jsx
+// src/components/auth/VerifyEmail.jsx
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import api from '../../utils/api';
+import Alert from '../ui/Alert';
+import Button from '../ui/Button';
 
-const VerifyEmail = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-  const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
-  const [message, setMessage] = useState('');
+export default function VerifyEmail() {
+  // Prendi solo il token da route param
+  const { token } = useParams();
   const navigate = useNavigate();
-  
+  const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
+  const [message, setMessage] = useState('');
+
   useEffect(() => {
-    const verifyEmail = async () => {
+    if (!token) {
+      setStatus('error');
+      setMessage('Link di verifica non valido.');
+      return;
+    }
+
+    const verify = async () => {
       try {
-        if (!token) {
-          setStatus('error');
-          setMessage('Token di verifica mancante');
-          return;
-        }
-        
-        const { data } = await axios.get(`http://localhost:5000/api/auth/verify-email/${token}` );
-        
+        console.log('>>> Frontend calling verify-email with token:', token);
+        const { data } = await api.get(`/api/auth/verify-email/${token}`);
         if (data.success) {
           setStatus('success');
-          setMessage(data.message);
-          
-          // Reindirizza alla pagina di login dopo 3 secondi
-          setTimeout(() => {
-            navigate('/login');
-          }, 3000);
+          setMessage('Email verificata con successo! Verrai reindirizzato alla home…');
+          setTimeout(() => navigate('/'), 3000);
+        } else {
+          setStatus('error');
+          setMessage(data.message || 'Verifica fallita');
         }
-      } catch (error) {
+      } catch (err) {
+        console.error('Errore verify-email:', err.response?.data || err.message);
         setStatus('error');
-        setMessage(error.response?.data?.message || 'Errore durante la verifica dell\'email');
+        setMessage(
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          'Errore nella verifica dell\'email'
+        );
       }
     };
-    
-    verifyEmail();
+
+    verify();
   }, [token, navigate]);
-  
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 text-center">
-        {status === 'verifying' && (
-          <>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Verifica dell'email in corso...
-            </h2>
-            <div className="mt-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-            </div>
-          </>
-        )}
-        
-        {status === 'success' && (
-          <>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Email verificata con successo!
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              {message}
-            </p>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Sarai reindirizzato alla pagina di login tra pochi secondi...
-            </p>
-          </>
-        )}
-        
-        {status === 'error' && (
-          <>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Errore nella verifica dell'email
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              {message}
-            </p>
-            <div className="mt-4">
-              <button
-                onClick={() => navigate('/login')}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Torna alla pagina di login
-              </button>
-            </div>
-          </>
-        )}
+
+  if (status === 'loading') {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-600">Verifica in corso…</p>
       </div>
+    );
+  }
+
+  return (
+    <div className="max-w-md mx-auto py-12 space-y-6 text-center">
+      {status === 'success' ? (
+        <Alert type="success" message={message} />
+      ) : (
+        <Alert type="error" message={message} />
+      )}
+
+      {status === 'error' && (
+        <Link to="/login">
+          <Button variant="primary">Torna al Login</Button>
+        </Link>
+      )}
     </div>
   );
-};
-
-export default VerifyEmail;
+}

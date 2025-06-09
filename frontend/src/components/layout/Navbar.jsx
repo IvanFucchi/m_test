@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import LocationSearchMap from '../common/LocationSearchMap';
+import { Avatar, AvatarImage, AvatarFallback } from "../shad-ui/avatar"
 
 const Navbar = ({ handleSearch }) => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -14,11 +15,11 @@ const Navbar = ({ handleSearch }) => {
   };
 
   return (
-    <nav className="bg-white-600 text-gray shadow-md">
+    <nav className="bg-white-600 text-black shadow-md">
       <div className="container-custom py-3">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            
+
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <img
@@ -33,8 +34,8 @@ const Navbar = ({ handleSearch }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="hover:text-gray-200 transition-colors">Home</Link>
-            <Link to="/explore" className="hover:text-gray-200 transition-colors">Esplora</Link>
+            <Link to="/" className="hover:text-amber-500 transition-colors">Home</Link>
+            <Link to="/explore" className="hover:text-amber-600 transition-colors">Esplora</Link>
 
             {isAuthenticated ? (
               <>
@@ -44,9 +45,23 @@ const Navbar = ({ handleSearch }) => {
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                   >
                     <span className="mr-1">{user.name}</span>
+
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
+
+                    <Link to="/profile" className="inline-block">
+                      <Avatar className="h-8 w-8">
+                        {/* Se esiste user.photoURL (Google), lo usi; altrimenti avatarUrl o le iniziali */}
+                        <AvatarImage
+                          src={user.photoURL ?? user.avatar}
+                          alt={user.name}
+                        />
+                        <AvatarFallback>
+                          {user.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Link>
                   </button>
 
                   {isMenuOpen && (
@@ -84,10 +99,11 @@ const Navbar = ({ handleSearch }) => {
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:text-blue-200 transition-colors">Login</Link>
+                <Link to="/login" className="hover:text-amber-800 transition-colors">Login</Link>
               </>
             )}
           </div>
+
 
           {/* Mobile menu button */}
           <button

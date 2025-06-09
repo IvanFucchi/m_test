@@ -38,7 +38,7 @@ const MainLayout = () => {
   return (
     <div className="w-full flex flex-col min-h-screen">
       <Navbar handleSearch={handleSearch} />
-      <main className="w-full flex-grow container-custom py-6">
+      <main className="w-full bg-zinc-950 flex-grow px-6 py-6">
         <Outlet context={{ center, zoom, markers, handleSearch, setMarkers }} />
       </main>
       <Footer />

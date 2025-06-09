@@ -44,7 +44,7 @@ export default function RegisterPage() {
             
             if (response) {
                 setSuccess(true);
-                setSuccessMessage("Registrazione completata! Controlla la tua email per verificare il tuo account.");
+                setSuccessMessage("Verifica la tua email per completare la creazione del tuo account.");
                 // Non facciamo il redirect automatico per permettere all'utente di leggere il messaggio
             }
         } catch (err) {

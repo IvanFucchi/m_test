@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';  // percorso relativo al file
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -83,7 +83,7 @@ const SearchInterface = () => {
       }
 
       // Esegui la ricerca
-      const { data } = await axios.get(`http://localhost:5000/api/spots?${queryParams.toString()}`);
+      const { data } = await api.get(`http://localhost:5000/api/spots?${queryParams.toString()}`);
 
       if (data.success) {
         setResults(data.data);

@@ -102,35 +102,46 @@ export const loginUser = async (req, res, next) => {
 // @desc    Verifica email utente
 // @route   GET /api/auth/verify-email/:token
 // @access  Public
-export const verifyEmail = async (req, res, next) => {
-  try {
-    const token = req.query.token;
-    console.log('Token ricevuto:', token); // Per debug
+// controllers/authController.js
 
-    const user = await User.findOne({
-      confirmationToken: token,
-      confirmationTokenExpires: { $gt: Date.now() }
-    });
+export const verifyEmail = async (req, res) => {
+  // 1) Prendi il token da req.params
+  const token = req.params.token;
+  console.log('>>> verifyEmail token:', token);
+
+  if (!token) {
+    return res.status(400).json({ success: false, message: 'Token mancante' });
+  }
+
+  try {
+    // 2) Trova l'utente che ha questo confirmationToken
+    const user = await User.findOne({ confirmationToken: token });
+    console.log('>>> user trovato:', user ? user.email : null);
 
     if (!user) {
-      res.status(400);
-      throw new Error('Token di verifica non valido o scaduto');
+      return res.status(400).json({ success: false, message: 'Token non valido' });
     }
 
-    // Aggiorna l'utente
-    user.isEmailVerified = true;
+    // 3) Controlla la scadenza
+    if (user.confirmationTokenExpires.getTime() < Date.now()) {
+      return res.status(400).json({ success: false, message: 'Token scaduto' });
+    }
+
+    // 4) Segna l'utente come verificato e pulisci i campi
+    user.isVerified = true;
     user.confirmationToken = undefined;
     user.confirmationTokenExpires = undefined;
     await user.save();
 
-    res.json({
-      success: true,
-      message: 'Email verificata con successo. Ora puoi accedere al tuo account.'
-    });
-  } catch (error) {
-    next(error);
+    console.log('>>> Email verificata per:', user.email);
+    return res.json({ success: true, message: 'Email verificata' });
+
+  } catch (err) {
+    console.error('>>> Errore interno verifyEmail:', err);
+    return res.status(500).json({ success: false, message: 'Errore interno' });
   }
 };
+
 
 // @desc    Richiedi nuovo token di verifica email
 // @route   POST /api/auth/resend-verification

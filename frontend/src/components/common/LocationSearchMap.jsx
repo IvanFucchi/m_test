@@ -4,6 +4,10 @@ import { useAuth } from '../../context/AuthContext';
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button"
 
+// prova bottone con icona
+import { MapPin } from "lucide-react"; // icona geolocalizzazione
+
+
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iY2tjaWt4MHJjdzJzc2F1em5scXI5aiJ9.eV_JXLtKNGzFIvsvXBV8FQ';
 
 
@@ -44,22 +48,28 @@ const LocationSearchMap = ({ onSearch: propSearch }) => {
   return (
     <div className="flex items-center gap-2 text-gray-700">
       <div className="relative">
-        {/*
-        <input
-          type="text"
-          value={searchText}
-          onChange={handleInputChange}
-          placeholder="Search for a city..."
-          className="border p-2 rounded w-full sm:w-80"
-        />
-        */}
 
-        <Input
-          type="text"
-          value={searchText}
-          onChange={handleInputChange}
-          placeholder="Search for a city..."
-        />
+
+        <div className="relative w-full max-w-md">
+          {/* Input vero e proprio, con padding-right extra per lo spazio dell’icona */}
+          <Input
+            type="text"
+            value={searchText}
+            onChange={handleInputChange}
+            placeholder="Search for a city..."
+            className="pr-10"     // spazio a destra per l’icona
+          />
+
+          {/* Icona cliccabile, posizionata assoluta */}
+          <button
+            type="button"
+            onClick={useMyLocation}
+            className="absolute inset-y-0 right-0 flex items-center pr-2"
+            aria-label="Use my location"
+          >
+            <MapPin className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+          </button>
+        </div>
 
         {suggestions.length > 0 && (
           <ul className="bg-white border rounded shadow max-h-64 overflow-y-auto absolute top-12 left-0 w-full z-20">
@@ -75,11 +85,7 @@ const LocationSearchMap = ({ onSearch: propSearch }) => {
           </ul>
         )}
       </div>
-      <Button
-        variant="outline"
-        onClick={useMyLocation}>
-        use my location
-      </Button>
+ 
     </div>
   );
 };
