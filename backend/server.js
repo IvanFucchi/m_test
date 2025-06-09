@@ -6,6 +6,8 @@ import passport from './config/passport.js';
 import session from 'express-session';
 // import authRoutes from './routes/authRoutes.js';
 import morgan from 'morgan';
+import suggestionsRoutes from './routes/suggestionsRoutes.js';
+
 
 import { notFound, errorHandler, validationErrorHandler, authErrorHandler } from './middleware/errorHandler.js';
 
@@ -153,5 +155,10 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Promessa non gestita:', promise, 'motivo:', reason);
   process.exit(1);
 });
+
+
+// per suggerimenti nuova barra di ricerca
+app.use('/api/suggestions', suggestionsRoutes);
+
 
 export default app;

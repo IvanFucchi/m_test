@@ -17,6 +17,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import ShadLoginPage from './pages/ShadLoginPage';
 import OAuthCallback from './components/auth/OAuthCallback';
 
+
 // Protected route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, user, loading } = useAuth();
