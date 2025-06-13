@@ -1,12 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import {AuthProvider, useAuth} from './context/AuthContext';
 import MainLayout from './components/layout/MainLayout';
 import VerifyEmail from './components/auth/VerifyEmail';
-
-
 import Header from './components/layout/Footer';
-// Pages
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
@@ -17,10 +14,9 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import ShadLoginPage from './pages/ShadLoginPage';
 import OAuthCallback from './components/auth/OAuthCallback';
 
-
 // Protected route component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, user, loading } = useAuth();
+const ProtectedRoute = ({children}) => {
+  const {isAuthenticated, user, loading} = useAuth();
 
   if (loading) {
     return (
@@ -31,16 +27,16 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login"/>;
   }
 
   return children;
 };
 
 // Componente per route admin (richiede ruolo admin)
-const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user, loading } = useAuth();
-  
+const AdminRoute = ({children}) => {
+  const {isAuthenticated, user, loading} = useAuth();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -48,11 +44,11 @@ const AdminRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   if (!isAuthenticated || user?.role !== 'admin') {
-    return <Navigate to="/" />;
+    return <Navigate to="/"/>;
   }
-  
+
   return children;
 };
 
@@ -61,35 +57,35 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="login" element={<ShadLoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="explore" element={<ExplorePage />} />
-            <Route path="/oauth-callback" element={<OAuthCallback />} />
-            <Route path="/verify-email/:token" element={<VerifyEmail />} /> {/* */}
+          <Route path="/" element={<MainLayout/>}>
+            <Route index element={<HomePage/>}/>
+            <Route path="login" element={<ShadLoginPage/>}/>
+            <Route path="register" element={<RegisterPage/>}/>
+            <Route path="explore" element={<ExplorePage/>}/>
+            <Route path="/oauth-callback" element={<OAuthCallback/>}/>
+            <Route path="/verify-email/:token" element={<VerifyEmail/>}/> {/* */}
             {/* Dynamic route for spot details */}
-            <Route path="spots/:id" element={<SpotDetailPage />} />
-            
+            <Route path="spots/:id" element={<SpotDetailPage/>}/>
+
             {/* Protected routes */}
-            <Route 
-              path="profile" 
+            <Route
+              path="profile"
               element={
                 <ProtectedRoute>
-                  <ProfilePage />
+                  <ProfilePage/>
                 </ProtectedRoute>
-              } 
+              }
             />
-            
-              {/* Route admin */}
-              <Route path="/admin" element={
-                <AdminRoute>
-                  <AdminDashboardPage />
-                </AdminRoute>
-              } />
-            
+
+            {/* Route admin */}
+            <Route path="/admin" element={
+              <AdminRoute>
+                <AdminDashboardPage/>
+              </AdminRoute>
+            }/>
+
             {/* 404 route */}
-            <Route path="*" element={<NotFoundPage />} />
+            <Route path="*" element={<NotFoundPage/>}/>
           </Route>
         </Routes>
       </Router>

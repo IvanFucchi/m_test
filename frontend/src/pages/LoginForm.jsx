@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import Alert from '../components/ui/Alert';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -22,7 +22,7 @@ const LoginForm = () => {
     const params = new URLSearchParams(location.search);
     const verified = params.get('verified');
     const error = params.get('error');
-    
+
     if (verified === 'true') {
       // Mostra un messaggio di successo se l'email è stata verificata
       setShowEmailVerificationModal(true);
@@ -30,7 +30,7 @@ const LoginForm = () => {
       // Mostra un messaggio di errore se c'è stato un problema con la verifica
       setFormError(decodeURIComponent(error));
     }
-    
+
     // Rimuovi i parametri dall'URL
     if (verified || error) {
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -48,16 +48,16 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
-    
+
     // Validazione base
     if (!formData.email || !formData.password) {
       setFormError('Please enter email and password');
       return;
     }
-    
+
     // Tentativo di login
     const result = await login(formData.email, formData.password);
-    
+
     if (result.success) {
       if (!result.isEmailVerified) {
         // Se l'email non è verificata, mostra un messaggio
@@ -84,18 +84,18 @@ const LoginForm = () => {
           MUSA ~ Discover Art
         </span>
       </div>
-      
+
       <h2 className="text-2xl font-bold mb-2">Sign in to your account</h2>
       <p className="text-sm text-gray-500 mb-6">
         Enter your credentials to access your account
       </p>
-      
+
       {formError && (
         <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">
           {formError}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium mb-1">
@@ -111,7 +111,7 @@ const LoginForm = () => {
             required
           />
         </div>
-        
+
         <div>
           <label htmlFor="password" className="block text-sm font-medium mb-1">
             Password
@@ -126,7 +126,7 @@ const LoginForm = () => {
             required
           />
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <input
@@ -139,14 +139,14 @@ const LoginForm = () => {
               Remember me
             </label>
           </div>
-          
+
           <div className="text-sm">
             <a href="#" className="text-blue-600 hover:text-blue-500">
               Forgot password?
             </a>
           </div>
         </div>
-        
+
         <Button
           type="submit"
           variant="primary"
@@ -155,7 +155,7 @@ const LoginForm = () => {
         >
           {loading ? 'Signing in...' : 'Sign in'}
         </Button>
-        
+
         <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
@@ -166,7 +166,7 @@ const LoginForm = () => {
             </span>
           </div>
         </div>
-        
+
         <button
           type="button"
           className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -186,7 +186,7 @@ const LoginForm = () => {
           Google
         </button>
       </form>
-      
+
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600">
           Don't have an account?{' '}

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Input } from "ui/input";
 import { Button } from "ui/button";
-import bgImage from "@/assets/1caverna_chauvet_.png"; 
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +12,7 @@ const LoginPage = () => {
   const { login, loginWithGoogle, isAuthenticated, error: authError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Redirect se l'utente è già autenticato
   useEffect(() => {
     if (isAuthenticated) {
@@ -28,12 +27,12 @@ const LoginPage = () => {
       setError(authError);
     }
   }, [authError]);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
-    
+
     try {
       const success = await login(email, password);
       if (success) {
@@ -45,11 +44,11 @@ const LoginPage = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   const handleGoogleLogin = () => {
     loginWithGoogle();
   };
-  
+
   return (
     <div className="flex min-h-screen">
       {/* Lato sinistro - form di login */}
@@ -69,14 +68,14 @@ const LoginPage = () => {
         <p className="text-sm text-gray-400 mb-6">
           Inserisci le tue credenziali per accedere
         </p>
-        
+
         {/* Mostra eventuali errori */}
         {error && (
           <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
-        
+
         {/* Form di login */}
         <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-sm">
           <div className="flex flex-col">
@@ -93,7 +92,7 @@ const LoginPage = () => {
               required
             />
           </div>
-          
+
           <div className="flex flex-col">
             <label htmlFor="password" className="text-sm font-medium mb-1">
               Password
@@ -108,7 +107,7 @@ const LoginPage = () => {
               required
             />
           </div>
-          
+
           <Button
             type="submit"
             className="w-full bg-white text-black hover:bg-gray-200"
@@ -116,7 +115,7 @@ const LoginPage = () => {
           >
             {isSubmitting ? 'Accesso in corso...' : 'Accedi'}
           </Button>
-          
+
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-700"></div>
@@ -127,7 +126,7 @@ const LoginPage = () => {
               </span>
             </div>
           </div>
-          
+
           <Button
             type="button"
             onClick={handleGoogleLogin}
@@ -143,7 +142,7 @@ const LoginPage = () => {
             </svg>
             Google
           </Button>
-          
+
           <div className="text-center text-sm text-gray-400">
             Non hai un account?{" "}
             <Link to="/register" className="text-white hover:underline">
@@ -152,12 +151,12 @@ const LoginPage = () => {
           </div>
         </form>
       </div>
-      
+
       {/* Lato destro - immagine */}
-      <div 
-        className="w-1/2 bg-cover bg-center" 
-        style={{ 
-          backgroundImage: `url(${bgImage})`,
+      <div
+        className="w-1/2 bg-cover bg-center"
+        style={{
+          backgroundImage: `url('/images/1caverna_chauvet_.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

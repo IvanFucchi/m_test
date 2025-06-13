@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import Navbar from './Navbar';
+import {useState} from 'react';
+import {Outlet} from 'react-router-dom';
+import Header from './Header';
 import Footer from './Footer';
 import api from '../../utils/api';  // Assicurati che il percorso sia corretto
 
@@ -13,7 +13,7 @@ const MainLayout = () => {
   // Gestisce la ricerca testuale
   const handleTextSearch = async (query) => {
     setSearchQuery(query);
-    
+
     try {
       // Chiamata API per ricerca globale
       const response = await api.get(`/api/spots?search=${query}`);
@@ -35,15 +35,15 @@ const MainLayout = () => {
   };
 
   // Gestisce la ricerca geografica (filtro)
-  const handleLocationSearch = ({ center, zoom }) => {
+  const handleLocationSearch = ({center, zoom}) => {
     if (!center || !Array.isArray(center) || center.length !== 2) {
       console.error('Coordinate non valide:', center);
       return;
     }
-    
+
     setCenter(center);
     setZoom(zoom);
-    
+
     // Se c'è già una query testuale, combina con le coordinate
     if (searchQuery) {
       fetchSpotsWithLocation(searchQuery, center);
@@ -78,7 +78,7 @@ const MainLayout = () => {
   // Recupera spot solo per posizione
   const fetchMarkersNear = async ([lng, lat]) => {
     if (!lng || !lat) return;
-    
+
     try {
       // Chiamata API solo con coordinate
       const response = await api.get(`/api/spots?lat=${lat}&lng=${lng}&distance=10`);
@@ -106,23 +106,23 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="w-full flex flex-col min-h-screen">
-      <Navbar 
-        handleTextSearch={handleTextSearch} 
-        handleLocationSearch={handleLocationSearch} 
+    <>
+      <Header
+        handleTextSearch={handleTextSearch}
+        handleLocationSearch={handleLocationSearch}
       />
-      <main className="w-full bg-zinc-950 flex-grow px-6 py-6">
-        <Outlet context={{ 
-          center, 
-          zoom, 
-          markers, 
-          handleTextSearch, 
-          handleLocationSearch, 
-          searchQuery 
-        }} />
+      <main className='bg-zinc-100 flex flex-col'>
+        <Outlet context={{
+          center,
+          zoom,
+          markers,
+          handleTextSearch,
+          handleLocationSearch,
+          searchQuery
+        }}/>
       </main>
-      <Footer />
-    </div>
+      <Footer/>
+    </>
   );
 };
 

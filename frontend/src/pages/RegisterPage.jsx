@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Input } from "ui/input";
 import { Button } from "ui/button";
-import bgImage from "@/assets/pittura-di-lascaux-orig.png"; 
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -31,7 +30,7 @@ export default function RegisterPage() {
         e.preventDefault();
         setIsSubmitting(true);
         setError("");
-        
+
         try {
             // Verifica che le password corrispondano
             if (formData.password !== formData.confirmPassword) {
@@ -39,9 +38,9 @@ export default function RegisterPage() {
                 setIsSubmitting(false);
                 return;
             }
-            
+
             const response = await register(formData.username, formData.email, formData.password);
-            
+
             if (response) {
                 setSuccess(true);
                 setSuccessMessage("Verifica la tua email per completare la creazione del tuo account.");
@@ -150,8 +149,8 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         className="w-full bg-white text-black hover:bg-gray-200"
                         disabled={isSubmitting}
                     >
@@ -168,10 +167,10 @@ export default function RegisterPage() {
             </div>
 
             {/* Lato destro - immagine */}
-            <div 
-                className="w-1/2 bg-cover bg-center" 
-                style={{ 
-                    backgroundImage: `url(${bgImage})`,
+            <div
+                className="w-1/2 bg-cover bg-center"
+                style={{
+                    backgroundImage: `url('/images/pittura-di-lascaux-orig.png')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                 }}
