@@ -11,7 +11,6 @@ import { MapPin } from "lucide-react"; // icona geolocalizzazione
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiaXZhbi1mdWNjaGkiLCJhIjoiY21iY2tjaWt4MHJjdzJzc2F1em5scXI5aiJ9.eV_JXLtKNGzFIvsvXBV8FQ';
 
 
-
 const LocationSearchMap = ({ onSearch: propSearch }) => {
   const { handleSearch } = useAuth();
   const onSearch = propSearch || handleSearch;
@@ -85,7 +84,7 @@ const LocationSearchMap = ({ onSearch: propSearch }) => {
           </ul>
         )}
       </div>
- 
+
     </div>
   );
 };
