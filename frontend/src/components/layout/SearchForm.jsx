@@ -1,23 +1,44 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState, useRef, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useGlobalState, useGlobalDispatch} from '@/context/GlobalState';
 
 const SearchForm = () => {
-  const [place, setPlace] = useState('');
-  const [activity, setActivity] = useState('');
+  const {place: globalPlace, activity: globalActivity} = useGlobalState();
+  const dispatch = useGlobalDispatch();
+  const [placeInput, setPlaceInput] = useState(globalPlace);
+  const [activityInput, setActivityInput] = useState(globalActivity);
   const navigate = useNavigate();
   const placeRef = useRef(null);
   const activityRef = useRef(null);
 
-  const isValid = place.trim() !== '' && activity.trim() !== '';
+  // sync initial global values
+  useEffect(() => {
+    setPlaceInput(globalPlace);
+    setActivityInput(globalActivity);
+  }, [globalPlace, globalActivity]);
+
+  const isValid = placeInput.trim() !== '' && activityInput.trim() !== '';
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!isValid) return;
-    if (placeRef.current) placeRef.current.blur();
-    if (activityRef.current) activityRef.current.blur();
+    dispatch({type: 'SET_PLACE', payload: placeInput.trim()});
+    dispatch({type: 'SET_ACTIVITY', payload: activityInput.trim()});
 
-    const params = new URLSearchParams({ place: place.trim(), activity: activity.trim() });
+    // Debug log on submit
+    console.log('Search submitted:', {
+      place: placeInput.trim(),
+      activity: activityInput.trim(),
+    });
+
+    // blur inputs
+    placeRef.current?.blur();
+    activityRef.current?.blur();
+
+    const params = new URLSearchParams({
+      place: placeInput.trim(),
+      activity: activityInput.trim(),
+    });
     navigate(`/explore?${params.toString()}`);
   };
 
@@ -28,8 +49,8 @@ const SearchForm = () => {
           type="text"
           name="place"
           placeholder="Luogo"
-          value={place}
-          onChange={(e) => setPlace(e.target.value)}
+          value={placeInput}
+          onChange={(e) => setPlaceInput(e.target.value)}
           ref={placeRef}
           className="w-full px-2 border-r"
           aria-label="Luogo da cercare"
@@ -38,8 +59,8 @@ const SearchForm = () => {
           type="text"
           name="activity"
           placeholder="Attività (arte)"
-          value={activity}
-          onChange={(e) => setActivity(e.target.value)}
+          value={activityInput}
+          onChange={(e) => setActivityInput(e.target.value)}
           ref={activityRef}
           className="w-full px-2"
           aria-label="Attività artistica da cercare"
@@ -47,6 +68,7 @@ const SearchForm = () => {
         <button
           type="submit"
           className="px-4 py-2 bg-zinc-950 text-white rounded hover:bg-zinc-700"
+          disabled={!isValid}
         >
           Cerca
         </button>

@@ -12,6 +12,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import LoginPage from './pages/LoginPage';
 import OAuthCallback from './components/auth/OAuthCallback';
+import {GlobalProvider} from '@/context/GlobalState';
 
 const ProtectedRoute = ({children}) => {
   const {isAuthenticated, user, loading} = useAuth();
@@ -47,20 +48,22 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<MainLayout/>}>
-            <Route index element={<HomePage/>}/>
-            <Route path="/login" element={<LoginPage/>}/>
-            <Route path="/register" element={<RegisterPage/>}/>
-            <Route path="/explore" element={<ExplorePage/>}/>
-            <Route path="/oauth-callback" element={<OAuthCallback/>}/>
-            <Route path="/verify-email/:token" element={<VerifyEmail/>}/>
-            <Route path="/spots/:id" element={<SpotDetailPage/>}/>
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage/></ProtectedRoute>}/>
-            <Route path="/admin" element={<AdminRoute><AdminDashboardPage/></AdminRoute>}/>
-            <Route path="*" element={<NotFoundPage/>}/>
-          </Route>
-        </Routes>
+        <GlobalProvider>
+          <Routes>
+            <Route path="/" element={<MainLayout/>}>
+              <Route index element={<HomePage/>}/>
+              <Route path="/login" element={<LoginPage/>}/>
+              <Route path="/register" element={<RegisterPage/>}/>
+              <Route path="/explore" element={<ExplorePage/>}/>
+              <Route path="/oauth-callback" element={<OAuthCallback/>}/>
+              <Route path="/verify-email/:token" element={<VerifyEmail/>}/>
+              <Route path="/spots/:id" element={<SpotDetailPage/>}/>
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage/></ProtectedRoute>}/>
+              <Route path="/admin" element={<AdminRoute><AdminDashboardPage/></AdminRoute>}/>
+              <Route path="*" element={<NotFoundPage/>}/>
+            </Route>
+          </Routes>
+        </GlobalProvider>
       </Router>
     </AuthProvider>
   );
