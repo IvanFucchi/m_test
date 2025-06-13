@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import Alert from '../components/ui/Alert';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import Modal from '../components/ui/Modal';
+import Alert from 'components/ui/Alert';
+import Button from 'components/ui/Button';
+import Input from 'components/ui/Input';
+import Modal from 'components/ui/Modal';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({

@@ -1,9 +1,9 @@
 // src/components/common/AvatarCropper.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 // Fai risalire di due livelli per utils/api.js
-import api from '../../utils/api';
+import api from 'lib/api';
 import Cropper from 'react-easy-crop';
-import getCroppedImg from '../../utils/cropImage';
+import getCroppedImg from 'lib/cropImage';
 import { Avatar, AvatarImage, AvatarFallback } from 'ui/avatar';
 import { PencilIcon, CheckIcon, XIcon } from 'lucide-react';
 import { Button } from 'ui/button';

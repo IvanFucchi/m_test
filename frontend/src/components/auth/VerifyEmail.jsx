@@ -1,7 +1,7 @@
 // src/components/auth/VerifyEmail.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import api from '../../utils/api';
+import api from 'lib/api';
 import Alert from '../ui/Alert';
 import Button from '../ui/Button';
 
