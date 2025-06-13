@@ -49,8 +49,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <div className="w-1/2 flex items-center justify-center px-8">
+    <div className="flex flex-wrap md:min-h-screen bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 my-20">
         <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm">
           <header>
             <h2 className="text-2xl font-bold mb-2">Accedi al tuo account</h2>
@@ -105,7 +105,7 @@ const LoginPage = () => {
           </div>
         </form>
       </div>
-      <div className={`w-1/2 bg-cover bg-center`} style={{backgroundImage: `url('/images/1caverna_chauvet_.png')`}}/>
+      <div className="w-full lg:w-1/2 hidden lg:block bg-cover bg-center" style={{backgroundImage: `url('/images/1caverna_chauvet_.png')`}}/>
     </div>
   );
 };
