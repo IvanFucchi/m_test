@@ -1,8 +1,8 @@
 import React, {createContext, useReducer, useContext, useEffect} from 'react';
 import {useLocation} from 'react-router-dom';
 
-const GlobalStateContext = createContext();
-const GlobalDispatchContext = createContext();
+const GlobalStateContext = createContext(undefined);
+const GlobalDispatchContext = createContext(undefined);
 
 const initialState = {
   place: '',

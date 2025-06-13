@@ -23,8 +23,8 @@ export default function Header({handleTextSearch, handleLocationSearch}) {
   };
 
   return (
-    <header className='sticky py-4 top-0 bg-white shadow z-20'>
-      <div className="container grid grid-cols-12 gap-4">
+    <header className='sticky py-4 top-0 bg-white border-b z-20'>
+      <div className="container grid grid-cols-12 gap-4 items-center">
         <div className="col-span-6 md:col-span-3 xl:col-span-4">
           <Link to="/" className="flex items-center gap-3 w-fit">
             <img

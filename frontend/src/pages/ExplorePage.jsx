@@ -1,28 +1,31 @@
 import MapView from '../components/common/MapView';
-import { useOutletContext } from 'react-router-dom';
+import {useOutletContext} from 'react-router-dom';
 
 const ExplorePage = () => {
   const context = useOutletContext();
 
   return (
-    <div className="w-full h-screen flex flex-col">
-      {/*
-      <header className="p-4 bg-white shadow z-10 flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Esplora gli spot artistici</h1>
-      </header>
-      */}
+    <section className="w-full h-[calc(100vh-82px)] flex">
+      <div className="container mx-auto py-4 flex flex-wrap h-full">
 
-      
-      <div className="flex-1">
-        <MapView
-          center={context.center}
-          zoom={context.zoom}
-          markers={context.markers}
-          onMarkerClick={(marker) => alert(`Clicked marker: ${marker.name}`)}
-        />
+
+        <div className="flex w-full lg:w-1/2">
+          risultati qui
+        </div>
+
+        <div className="flex w-full lg:w-1/2 rounded-lg overflow-hidden">
+          <MapView
+            center={context.center}
+            zoom={context.zoom}
+            markers={context.markers}
+            onMarkerClick={(marker) => alert(`Clicked marker: ${marker.name}`)}
+          />
+        </div>
+
+
       </div>
-    </div>
+    </section>
   );
 };
 
-export default ExplorePage; 
+export default ExplorePage;
