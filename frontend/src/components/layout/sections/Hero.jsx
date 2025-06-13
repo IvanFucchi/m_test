@@ -1,6 +1,5 @@
 import {Link} from "react-router-dom";
 import React from "react";
-import {MagnifyingGlassIcon, MapPinIcon, MusicalNoteIcon} from "@heroicons/react/24/solid";
 
 const Hero = () => {
   return (
@@ -17,7 +16,7 @@ const Hero = () => {
       </div>
       <div className="container mx-auto relative overflow-hidden rounded-lg">
         <div className="max-w-xl lg:ms-32">
-          <div className="py-28 rounded-lg relative z-10">
+          <div className="py-32 rounded-lg relative z-10">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">Scopri l'arte in base al tuo mood</h1>
             <p className="mb-8 text-white">
               MUSA ti supporta nella scoperta di opere d’arte, musei, gallerie ed eventi culturali, valorizzando il tuo stato d’animo e le tue
